@@ -2,7 +2,6 @@ package mq
 
 import (
 	"context"
-
 	"github.com/go-redis/redis/v8"
 	"github.com/golang/glog"
 	"github.com/thoas/go-funk"
@@ -67,18 +66,18 @@ func (r *RedisMq) recvMessages(queue, group, consumer, consumeID string) []Queue
 func (r *RedisMq) createQueue(queue, group, consumeID string) {
 	cli := r.getClient()
 	glog.Infof("Create queue %s-%s", queue, group)
-	err := cli.XGroupCreate(context.TODO(), queue, group, consumeID).Err()
+	err := cli.XGroupCreateMkStream(context.TODO(), queue, group, consumeID).Err()
 	if err != nil {
-		glog.Warningf("Create redis queue failed: %v", err)
+		glog.Warningf("Create redis queue error: %v", err)
 	}
 }
 
-func (r *RedisMq) SubscribeQueue(queue, group, consumer string) <-chan interface{} {
+func (r *RedisMq) SubscribeQueue(queue, group, consumer string) <-chan map[string]interface{} {
 	cli := r.getClient()
 	r.createQueue(queue, group, "0")
 	glog.Info("Subscribing message")
 
-	msg := make(chan interface{})
+	msg := make(chan map[string]interface{})
 
 	go func() {
 		for {

@@ -1,6 +1,7 @@
 package stream
 
 import (
+	"regexp"
 	"strconv"
 	"sync"
 
@@ -9,6 +10,10 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/xuelang-group/suanpan-go-sdk/config"
 	"github.com/xuelang-group/suanpan-go-sdk/mq"
+)
+
+const (
+	InputPattern = `^in(\d+)$`
 )
 
 type EnvStream struct {
@@ -23,6 +28,12 @@ type Stream struct {
 	StreamRecvQueue                string
 	StreamSendQueueMaxLength       int64
 	StreamSendQueueTrimImmediately bool
+}
+
+type Message struct {
+	ID    string      `mapstructure:"id"`
+	Extra interface{} `mapstructure:"extra"`
+	Data  interface{}
 }
 
 var (
@@ -42,7 +53,7 @@ func buildStream() *Stream {
 	argsMap := config.GetArgs()
 	var envStream EnvStream
 	mapstructure.Decode(argsMap, &envStream)
-	defaults.SetDefaults(envStream)
+	defaults.SetDefaults(&envStream)
 
 	sendQueue := envStream.StreamSendQueue
 	if sendQueue == "" {
@@ -70,24 +81,47 @@ func buildStream() *Stream {
 	}
 }
 
-func SendMessage(data interface{}) string {
+func (m *Message) Send(data map[string]interface{}) string {
 	s := getStream()
-	return s.sendMessage(data)
+	data["request_id"] = m.ID
+	data["extra"] = m.Extra
+	data["node_id"] = config.GetEnv().SpNodeId
+	return s.send(data)
 }
 
-func SubscribeQueue() <-chan interface{} {
+func Subscribe() <-chan Message {
 	s := getStream()
-	return s.subscribeQueue()
+	return s.subscribe()
 }
 
-func (s *Stream) sendMessage(data interface{}) string {
+func (s *Stream) send(data map[string]interface{}) string {
 	q := mq.GetMq()
 	return q.SendMessage(s.StreamSendQueue, data, s.StreamSendQueueMaxLength, s.StreamSendQueueTrimImmediately)
 }
 
-func (s *Stream) subscribeQueue() <-chan interface{} {
+func (s *Stream) subscribe() <-chan Message {
 	q := mq.GetMq()
 	group := config.GetEnv().SpNodeGroup
 	consumer := config.GetEnv().SpNodeId
-	return q.SubscribeQueue(s.StreamRecvQueue, group, consumer)
+
+	msgs := make(chan Message)
+
+	go func() {
+		for msg := range q.SubscribeQueue(s.StreamRecvQueue, group, consumer) {
+			var message Message
+			mapstructure.Decode(msg, &message)
+			for k, v := range msg {
+				match, err := regexp.MatchString(InputPattern, k)
+				if err != nil {
+					glog.Errorf("Message regex match error: %v", err)
+				}
+				if match {
+					message.Data = v
+				}
+			}
+			msgs <- message
+		}
+	}()
+
+	return msgs
 }

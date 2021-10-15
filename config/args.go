@@ -9,13 +9,16 @@ import (
 )
 
 var (
-	argsMap *map[string]string
+	argsMap = make(map[string]string)
 	argsOnce sync.Once
 )
 
-const ArgPrefix = `--`
+const (
+	ArgNamePrefix = `--`
+	ArgValuePrefix = `'`
+)
 
-func GetArgs() *map[string]string {
+func GetArgs() map[string]string {
 	argsOnce.Do(func() {
 		argsMap = buildArgs()
 	})
@@ -23,7 +26,7 @@ func GetArgs() *map[string]string {
 	return argsMap
 }
 
-func buildArgs() *map[string]string {
+func buildArgs() map[string]string {
 	e := GetEnv()
 	params, err := util.DecodeBase64(e.SpParam)
 	if err != nil {
@@ -33,11 +36,14 @@ func buildArgs() *map[string]string {
 
 	paramArray := strings.Fields(strings.TrimSpace(params))
 	for i := 0; i < len(paramArray); i++ {
-		if strings.HasPrefix(paramArray[i], ArgPrefix) {
+		if strings.HasPrefix(paramArray[i], ArgNamePrefix) &&
+			i+1 < len(paramArray) &&
+			strings.HasPrefix(paramArray[i+1], ArgValuePrefix) {
 			if i+1 < len(paramArray) {
-				(*argsMap)[paramArray[i]] = paramArray[i+1]
+				argsMap[paramArray[i]] = strings.Trim(paramArray[i+1], ArgValuePrefix)
+				i++
 			} else {
-				(*argsMap)[paramArray[i]] = ""
+				argsMap[paramArray[i]] = ""
 			}
 		}
 	}

@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	e *Env
+	e = &Env{}
 	envOnce sync.Once
 )
 

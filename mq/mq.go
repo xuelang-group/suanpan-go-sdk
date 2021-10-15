@@ -13,7 +13,7 @@ const (
 
 type Mq interface {
 	SendMessage(queue string, data interface{}, maxLen int64, trimImmediately bool)	string
-	SubscribeQueue(queue, group, consumer string) <-chan interface{}
+	SubscribeQueue(queue, group, consumer string) <-chan map[string]interface{}
 }
 
 type EnvMq struct {
@@ -24,12 +24,12 @@ func GetMq() Mq {
 	argsMap := config.GetArgs()
 	var envMq EnvMq
 	mapstructure.Decode(argsMap, &envMq)
-	defaults.SetDefaults(envMq)
+	defaults.SetDefaults(&envMq)
 	switch envMq.MqType {
 	case Redis:
 		var redisMq RedisMq
-		mapstructure.Decode(argsMap, redisMq)
-		defaults.SetDefaults(redisMq)
+		mapstructure.Decode(argsMap, &redisMq)
+		defaults.SetDefaults(&redisMq)
 		return &redisMq
 	default:
 		glog.Errorf("Unsupported mq type: %s", envMq.MqType)

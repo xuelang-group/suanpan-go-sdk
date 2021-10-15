@@ -23,12 +23,12 @@ func GetStorage() Storage {
 	argsMap := config.GetArgs()
 	var envStorage EnvStorage
 	mapstructure.Decode(argsMap, &envStorage)
-	defaults.SetDefaults(envStorage)
+	defaults.SetDefaults(&envStorage)
 	switch envStorage.StorageType {
 	case Minio:
 		var minioStorage MinioStorage
-		mapstructure.Decode(argsMap, minioStorage)
-		defaults.SetDefaults(minioStorage)
+		mapstructure.Decode(argsMap, &minioStorage)
+		defaults.SetDefaults(&minioStorage)
 		return &minioStorage
 	default:
 		glog.Errorf("Unsupported storage type: %s", envStorage.StorageType)
