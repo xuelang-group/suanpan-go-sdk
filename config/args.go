@@ -1,11 +1,11 @@
 package config
 
 import (
+	"encoding/base64"
 	"strings"
 	"sync"
 
 	"github.com/golang/glog"
-	"github.com/xuelang-group/suanpan-go-sdk/util"
 )
 
 var (
@@ -28,13 +28,13 @@ func GetArgs() map[string]string {
 
 func buildArgs() map[string]string {
 	e := GetEnv()
-	params, err := util.DecodeBase64(e.SpParam)
+	params, err := base64.StdEncoding.DecodeString(e.SpParam)
 	if err != nil {
 		glog.Errorf("Decode sp param failed: %v", err)
 		return nil
 	}
 
-	paramArray := strings.Fields(strings.TrimSpace(params))
+	paramArray := strings.Fields(strings.TrimSpace(string(params)))
 	for i := 0; i < len(paramArray); i++ {
 		if strings.HasPrefix(paramArray[i], ArgNamePrefix) &&
 			i+1 < len(paramArray) &&
