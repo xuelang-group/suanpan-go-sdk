@@ -30,7 +30,7 @@ type Stream struct {
 	StreamSendQueueTrimImmediately bool
 }
 
-type Message struct {
+type Request struct {
 	ID    string      `mapstructure:"id"`
 	Extra interface{} `mapstructure:"extra"`
 	Data  interface{}
@@ -81,15 +81,15 @@ func buildStream() *Stream {
 	}
 }
 
-func (m *Message) Send(data map[string]interface{}) string {
+func (r *Request) Send(data map[string]interface{}) string {
 	s := getStream()
-	data["request_id"] = m.ID
-	data["extra"] = m.Extra
+	data["request_id"] = r.ID
+	data["extra"] = r.Extra
 	data["node_id"] = config.GetEnv().SpNodeId
 	return s.send(data)
 }
 
-func Subscribe() <-chan Message {
+func Subscribe() <-chan Request {
 	s := getStream()
 	return s.subscribe()
 }
@@ -99,29 +99,29 @@ func (s *Stream) send(data map[string]interface{}) string {
 	return q.SendMessage(s.StreamSendQueue, data, s.StreamSendQueueMaxLength, s.StreamSendQueueTrimImmediately)
 }
 
-func (s *Stream) subscribe() <-chan Message {
+func (s *Stream) subscribe() <-chan Request {
 	q := mq.GetMq()
 	group := config.GetEnv().SpNodeGroup
 	consumer := config.GetEnv().SpNodeId
 
-	msgs := make(chan Message)
+	reqs := make(chan Request)
 
 	go func() {
 		for msg := range q.SubscribeQueue(s.StreamRecvQueue, group, consumer) {
-			var message Message
-			mapstructure.Decode(msg, &message)
+			var req Request
+			mapstructure.Decode(msg, &req)
 			for k, v := range msg {
 				match, err := regexp.MatchString(InputPattern, k)
 				if err != nil {
 					glog.Errorf("Message regex match error: %v", err)
 				}
 				if match {
-					message.Data = v
+					req.Data = v
 				}
 			}
-			msgs <- message
+			reqs <- req
 		}
 	}()
 
-	return msgs
+	return reqs
 }
