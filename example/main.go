@@ -1,6 +1,7 @@
 package main
 
 import (
+	// "encoding/json"
 	"github.com/xuelang-group/suanpan-go-sdk/suanpan/stream"
 )
 
@@ -9,7 +10,6 @@ func handle(r stream.Request) {
 	// _ = json.Unmarshal([]byte(r.Data.(string)), &m)
 	// m["hello"] = "world"
 	// r.Data, _ = json.Marshal(m)
-
 	r.Send(map[string]interface{}{
 		"out1": r.Data,
 	})

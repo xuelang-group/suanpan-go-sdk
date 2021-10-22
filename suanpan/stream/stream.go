@@ -86,15 +86,13 @@ func (r *Request) Send(data map[string]interface{}) string {
 }
 
 func (r *Request) SendSuccess(data map[string]interface{}) string {
-	s := getStream()
 	data["success"] = "true"
-	return s.send(data)
+	return r.send(data)
 }
 
 func (r *Request) SendFailure(data map[string]interface{}) string {
-	s := getStream()
 	data["success"] = "false"
-	return s.send(data)
+	return r.send(data)
 }
 
 func Subscribe() <-chan Request {
