@@ -2,6 +2,7 @@ package mq
 
 import (
 	"context"
+
 	"github.com/go-redis/redis/v8"
 	"github.com/golang/glog"
 	"github.com/thoas/go-funk"
@@ -10,13 +11,6 @@ import (
 type RedisMq struct {
 	MqRedisHost string `mapstructure:"--mq-redis-host" default:"localhost"`
 	MqRedisPort string `mapstructure:"--mq-redis-port" default:"6379"`
-}
-
-type QueueMessage struct {
-	ID    string
-	Data  map[string]interface{}
-	Queue string
-	Group string
 }
 
 func (r *RedisMq) getClient() *redis.Client {

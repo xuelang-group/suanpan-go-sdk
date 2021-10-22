@@ -1,0 +1,106 @@
+package storage
+
+import (
+	"io"
+
+	"github.com/aliyun/aliyun-oss-go-sdk/oss"
+	"github.com/golang/glog"
+)
+
+type OssStorage struct {
+	StorageOssEndpoint    string `mapstructure:"--storage-oss-endpoint" default:"http://oss-cn-beijing.aliyuncs.com"`
+	StorageOssBucketName  string `mapstructure:"--storage-oss-bucket-name" default:"suanpan"`
+	StorageOssAccessId    string `mapstructure:"--storage-oss-access-id"`
+	StorageOssAccessKey   string `mapstructure:"--storage-oss-access-key"`
+	StorageOssTempStore   string `mapstructure:"--storage-oss-temp-store"`
+	StorageOssGlobalStore string `mapstructure:"--storage-oss-global-store"`
+}
+
+func (o *OssStorage) getBucket() (*oss.Bucket, error) {
+	cli, err := oss.New(o.StorageOssEndpoint, o.StorageOssAccessId, o.StorageOssAccessKey)
+	if err != nil {
+		return nil, err
+	}
+
+	bucket, err := cli.Bucket(o.StorageOssBucketName)
+	if err != nil {
+		glog.Errorf("Get oss bucket error: %v", err)
+		return nil, err
+	}
+
+	return bucket, nil
+}
+
+func (o *OssStorage) FGetObject(objectName, filePath string) error {
+	bucket, err := o.getBucket()
+	if err != nil {
+		return err
+	}
+
+	return bucket.GetObjectToFile(objectName, filePath)
+}
+
+func (o *OssStorage) FPutObject(objectName, filePath string) error {
+	bucket, err := o.getBucket()
+	if err != nil {
+		return err
+	}
+
+	return bucket.PutObjectFromFile(objectName, filePath)
+}
+
+func (o *OssStorage) PutObject(objectName string, reader io.Reader) error {
+	bucket, err := o.getBucket()
+	if err != nil {
+		return err
+	}
+
+	return bucket.PutObject(objectName, reader)
+}
+
+func (o *OssStorage) ListObjects(objectPrefix string, recursive bool, maxKeys int) ([]ObjectItem, error) {
+	bucket, err := o.getBucket()
+	if err != nil {
+		return nil, err
+	}
+
+	delimiter := oss.Delimiter(`/`)
+	if recursive {
+		delimiter = oss.Delimiter(``)
+	}
+
+	res, err := bucket.ListObjectsV2(oss.Prefix(objectPrefix), oss.MaxKeys(maxKeys), delimiter)
+	if err != nil {
+		glog.Errorf("List oss objects error: %v", err)
+		return nil, err
+	}
+
+	objects := make([]ObjectItem, 0, 0)
+	for _, o := range res.Objects {
+		objects = append(objects, ObjectItem{
+			Name: o.Key,
+			LastModified: ISOString(o.LastModified),
+		})
+	}
+
+	return objects, nil
+}
+
+func (o *OssStorage) DeleteObject(objectName string) error {
+	bucket, err := o.getBucket()
+	if err != nil {
+		return err
+	}
+
+	return bucket.DeleteObject(objectName)
+}
+
+func (o *OssStorage) DeleteMultiObjects(objectNames []string) error {
+	bucket, err := o.getBucket()
+	if err != nil {
+		return err
+	}
+
+	_, err = bucket.DeleteObjects(objectNames)
+	return err
+}

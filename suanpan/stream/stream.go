@@ -82,16 +82,32 @@ func buildStream() *Stream {
 }
 
 func (r *Request) Send(data map[string]interface{}) string {
+	return r.SendSuccess(data)
+}
+
+func (r *Request) SendSuccess(data map[string]interface{}) string {
 	s := getStream()
-	data["request_id"] = r.ID
-	data["extra"] = r.Extra
-	data["node_id"] = config.GetEnv().SpNodeId
+	data["success"] = "true"
+	return s.send(data)
+}
+
+func (r *Request) SendFailure(data map[string]interface{}) string {
+	s := getStream()
+	data["success"] = "false"
 	return s.send(data)
 }
 
 func Subscribe() <-chan Request {
 	s := getStream()
 	return s.subscribe()
+}
+
+func (r *Request) send(data map[string]interface{}) string {
+	s := getStream()
+	data["request_id"] = r.ID
+	data["extra"] = r.Extra
+	data["node_id"] = config.GetEnv().SpNodeId
+	return s.send(data)
 }
 
 func (s *Stream) send(data map[string]interface{}) string {

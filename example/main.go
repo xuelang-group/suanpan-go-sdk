@@ -1,7 +1,6 @@
 package main
 
 import (
-	// "encoding/json"
 	"github.com/xuelang-group/suanpan-go-sdk/suanpan/stream"
 )
 
@@ -19,7 +18,7 @@ func handle(r stream.Request) {
 func main() {
 	reqs := stream.Subscribe()
 
-	forever := make(chan bool)
+	forever := make(chan struct{})
 
 	go func() {
 		for req := range reqs {
