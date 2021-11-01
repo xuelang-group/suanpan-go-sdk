@@ -10,14 +10,24 @@ import (
 )
 
 var (
-	e = &Env{}
+	e       = &Env{}
 	envOnce sync.Once
 )
 
-type Env struct{
-	SpParam		string		`envconfig:"SP_PARAM"`
-	SpNodeId	string		`envconfig:"SP_NODE_ID" validate:"required"`
-	SpNodeGroup	string		`envconfig:"SP_NODE_GROUP" default:"default"`
+type Env struct {
+	SpParam                      string `envconfig:"SP_PARAM"`
+	SpNodeId                     string `envconfig:"SP_NODE_ID" validate:"required"`
+	SpNodeGroup                  string `envconfig:"SP_NODE_GROUP" default:"default"`
+	SpDebug                      string `envconfig:"SP_DEBUG"`
+	SpHost                       string `envconfig:"SP_HOST" validate:"required"`
+	SpHostTls                    string `envconfig:"SP_HOST_TLS" default:"false"`
+	SpOs                         string `envconfig:"SP_OS" default:"kubernetes"`
+	SpPort                       string `envconfig:"SP_PORT" default:"7000"`
+	SpUserId                     string `envconfig:"SP_USER_ID" validate:"required"`
+	SpAccessSecret               string `envconfig:"SP_ACCESS_SECRET" validate:"required"`
+	SpUserIdHeaderField          string `envconfig:"SP_USER_ID_HEADER_FIELD" default:"x-sp-user-id"`
+	SpUserSignatureHeaderField   string `envconfig:"SP_USER_SIGNATURE_HEADER_FIELD" default:"x-sp-signature"`
+	SpUserSignVersionHeaderField string `envconfig:"SP_USER_SIGN_VERSION_HEADER_FIELD" default:"x-sp-sign-version"`
 }
 
 func GetEnv() *Env {

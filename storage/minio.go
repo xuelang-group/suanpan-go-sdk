@@ -78,7 +78,7 @@ func (m *MinioStorage) ListObjects(objectPrefix string, recursive bool, maxKeys 
 	doneCh := make(chan struct{})
 	defer close(doneCh)
 
-	objects := make([]ObjectItem, 0, 0)
+	objects := make([]ObjectItem, 0)
 	for o := range cli.ListObjectsV2(m.StorageMinioBucketName, objectPrefix, recursive, doneCh) {
 		objects = append(objects, ObjectItem{
 			Name: o.Key,

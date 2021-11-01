@@ -32,5 +32,5 @@ storage.FPutObject(objectName, filePath)
 storage.PutObject(objectName, data)
 storage.ListObjects(prefix)
 storage.DeleteObject(objectName)
-storage.DeleteObjects(objectNames)
+storage.DeleteMultiObjects(objectNames)
 ```

@@ -5,6 +5,7 @@ import (
 
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"github.com/golang/glog"
+	"github.com/xuelang-group/suanpan-go-sdk/backend"
 )
 
 type OssStorage struct {
@@ -17,7 +18,13 @@ type OssStorage struct {
 }
 
 func (o *OssStorage) getBucket() (*oss.Bucket, error) {
-	cli, err := oss.New(o.StorageOssEndpoint, o.StorageOssAccessId, o.StorageOssAccessKey)
+	resp, err := backend.GetStsTokenResp()
+	if err != nil {
+		return nil, err
+	}
+
+	cli, err := oss.New(o.StorageOssEndpoint, resp.Credentials.AccessKeyId,
+		resp.Credentials.AccessKeySecret, oss.SecurityToken(resp.Credentials.SecurityToken))
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +82,7 @@ func (o *OssStorage) ListObjects(objectPrefix string, recursive bool, maxKeys in
 		return nil, err
 	}
 
-	objects := make([]ObjectItem, 0, 0)
+	objects := make([]ObjectItem, 0)
 	for _, o := range res.Objects {
 		objects = append(objects, ObjectItem{
 			Name: o.Key,

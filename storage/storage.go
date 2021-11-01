@@ -6,7 +6,6 @@ import (
 	"github.com/golang/glog"
 	"github.com/mcuadros/go-defaults"
 	"github.com/mitchellh/mapstructure"
-	"github.com/xuelang-group/suanpan-go-sdk/config"
 )
 
 type Storage interface {
@@ -27,8 +26,7 @@ const (
 	Oss = "oss"
 )
 
-func GetStorage() Storage {
-	argsMap := config.GetArgs()
+func New(argsMap map[string]string) Storage {
 	var envStorage EnvStorage
 	mapstructure.Decode(argsMap, &envStorage)
 	defaults.SetDefaults(&envStorage)

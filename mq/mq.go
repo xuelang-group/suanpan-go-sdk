@@ -4,7 +4,6 @@ import (
 	"github.com/golang/glog"
 	"github.com/mcuadros/go-defaults"
 	"github.com/mitchellh/mapstructure"
-	"github.com/xuelang-group/suanpan-go-sdk/config"
 )
 
 const (
@@ -20,8 +19,7 @@ type EnvMq struct {
 	MqType	string	`mapstructure:"--mq-type" default:"redis"`
 }
 
-func GetMq() Mq {
-	argsMap := config.GetArgs()
+func New(argsMap map[string]string) Mq {
 	var envMq EnvMq
 	mapstructure.Decode(argsMap, &envMq)
 	defaults.SetDefaults(&envMq)

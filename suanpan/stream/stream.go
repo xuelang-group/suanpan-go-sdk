@@ -30,12 +30,6 @@ type Stream struct {
 	StreamSendQueueTrimImmediately bool
 }
 
-type Request struct {
-	ID    string      `mapstructure:"id"`
-	Extra interface{} `mapstructure:"extra"`
-	Data  interface{}
-}
-
 var (
 	s          *Stream
 	streamOnce sync.Once
@@ -81,6 +75,11 @@ func buildStream() *Stream {
 	}
 }
 
+func Subscribe() <-chan Request {
+	s := getStream()
+	return s.subscribe()
+}
+
 func (r *Request) Send(data map[string]interface{}) string {
 	return r.SendSuccess(data)
 }
@@ -95,9 +94,24 @@ func (r *Request) SendFailure(data map[string]interface{}) string {
 	return r.send(data)
 }
 
-func Subscribe() <-chan Request {
+func Send(data map[string]interface{}) string {
+	return SendSuccess(data)
+}
+
+func SendSuccess(data map[string]interface{}) string {
 	s := getStream()
-	return s.subscribe()
+	data["success"] = "true"
+	data["request_id"] = GenerateUUID()
+	data["node_id"] = config.GetEnv().SpNodeId
+	return s.send(data)
+}
+
+func SendFailure(data map[string]interface{}) string {
+	s := getStream()
+	data["success"] = "false"
+	data["request_id"] = GenerateUUID()
+	data["node_id"] = config.GetEnv().SpNodeId
+	return s.send(data)
 }
 
 func (r *Request) send(data map[string]interface{}) string {
@@ -109,12 +123,12 @@ func (r *Request) send(data map[string]interface{}) string {
 }
 
 func (s *Stream) send(data map[string]interface{}) string {
-	q := mq.GetMq()
+	q := mq.New(config.GetArgs())
 	return q.SendMessage(s.StreamSendQueue, data, s.StreamSendQueueMaxLength, s.StreamSendQueueTrimImmediately)
 }
 
 func (s *Stream) subscribe() <-chan Request {
-	q := mq.GetMq()
+	q := mq.New(config.GetArgs())
 	group := config.GetEnv().SpNodeGroup
 	consumer := config.GetEnv().SpNodeId
 

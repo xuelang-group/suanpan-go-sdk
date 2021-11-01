@@ -31,7 +31,7 @@ func (r *RedisMq) recvMessages(queue, group, consumer, consumeID string) []Queue
 		glog.Errorf("Read redis group failed: %v", err)
 	}
 
-	messages := make([]QueueMessage, 0, len(res))
+	messages := make([]QueueMessage, len(res))
 	for _, x := range res {
 		for _, m := range x.Messages {
 			messages = append(messages, QueueMessage{
