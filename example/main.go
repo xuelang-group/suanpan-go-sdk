@@ -7,10 +7,12 @@ import (
 
 func handle(r stream.Request) {
 	// m := make(map[string]string)
-	// _ = json.Unmarshal([]byte(r.Data.(string)), &m)
+	// _ = json.Unmarshal([]byte(r.Data), &m)
 	// m["hello"] = "world"
-	// r.Data, _ = json.Marshal(m)
-	r.Send(map[string]interface{}{
+	// b, _ := json.Marshal(m)
+	// r.Data = string(b)
+
+	r.Send(map[string]string{
 		"out1": r.Data,
 	})
 }

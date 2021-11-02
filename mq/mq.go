@@ -11,8 +11,8 @@ const (
 )
 
 type Mq interface {
-	SendMessage(queue string, data interface{}, maxLen int64, trimImmediately bool)	string
-	SubscribeQueue(queue, group, consumer string) <-chan map[string]interface{}
+	SendMessage(queue string, data map[string]string, maxLen int64, trimImmediately bool)	string
+	SubscribeQueue(queue, group, consumer string) <-chan map[string]string
 }
 
 type EnvMq struct {

@@ -80,25 +80,25 @@ func Subscribe() <-chan Request {
 	return s.subscribe()
 }
 
-func (r *Request) Send(data map[string]interface{}) string {
+func (r *Request) Send(data map[string]string) string {
 	return r.SendSuccess(data)
 }
 
-func (r *Request) SendSuccess(data map[string]interface{}) string {
+func (r *Request) SendSuccess(data map[string]string) string {
 	data["success"] = "true"
 	return r.send(data)
 }
 
-func (r *Request) SendFailure(data map[string]interface{}) string {
+func (r *Request) SendFailure(data map[string]string) string {
 	data["success"] = "false"
 	return r.send(data)
 }
 
-func Send(data map[string]interface{}) string {
+func Send(data map[string]string) string {
 	return SendSuccess(data)
 }
 
-func SendSuccess(data map[string]interface{}) string {
+func SendSuccess(data map[string]string) string {
 	s := getStream()
 	data["success"] = "true"
 	data["request_id"] = GenerateUUID()
@@ -106,7 +106,7 @@ func SendSuccess(data map[string]interface{}) string {
 	return s.send(data)
 }
 
-func SendFailure(data map[string]interface{}) string {
+func SendFailure(data map[string]string) string {
 	s := getStream()
 	data["success"] = "false"
 	data["request_id"] = GenerateUUID()
@@ -114,7 +114,7 @@ func SendFailure(data map[string]interface{}) string {
 	return s.send(data)
 }
 
-func (r *Request) send(data map[string]interface{}) string {
+func (r *Request) send(data map[string]string) string {
 	s := getStream()
 	data["request_id"] = r.ID
 	data["extra"] = r.Extra
@@ -122,7 +122,7 @@ func (r *Request) send(data map[string]interface{}) string {
 	return s.send(data)
 }
 
-func (s *Stream) send(data map[string]interface{}) string {
+func (s *Stream) send(data map[string]string) string {
 	q := mq.New(config.GetArgs())
 	return q.SendMessage(s.StreamSendQueue, data, s.StreamSendQueueMaxLength, s.StreamSendQueueTrimImmediately)
 }

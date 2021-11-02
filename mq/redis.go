@@ -36,7 +36,7 @@ func (r *RedisMq) recvMessages(queue, group, consumer, consumeID string) []Queue
 		for _, m := range x.Messages {
 			messages = append(messages, QueueMessage{
 				ID:    m.ID,
-				Data:  m.Values,
+				Data:  func() interface{} { return m.Values }().(map[string]string),
 				Queue: x.Stream,
 				Group: group,
 			})
@@ -66,17 +66,17 @@ func (r *RedisMq) createQueue(queue, group, consumeID string) {
 	}
 }
 
-func (r *RedisMq) SubscribeQueue(queue, group, consumer string) <-chan map[string]interface{} {
+func (r *RedisMq) SubscribeQueue(queue, group, consumer string) <-chan map[string]string {
 	cli := r.getClient()
 	r.createQueue(queue, group, "0")
 	glog.Info("Subscribing message")
 
-	msg := make(chan map[string]interface{})
+	msg := make(chan map[string]string)
 
 	go func() {
 		for {
 			messages := r.recvMessages(queue, group, consumer, ">")
-			for _, message := range messages{
+			for _, message := range messages {
 				msg <- message.Data
 				cli.XAck(context.TODO(), queue, group, message.ID)
 			}
@@ -86,12 +86,12 @@ func (r *RedisMq) SubscribeQueue(queue, group, consumer string) <-chan map[strin
 	return msg
 }
 
-func (r *RedisMq) SendMessage(queue string, data interface{}, maxLen int64, trimImmediately bool) string {
+func (r *RedisMq) SendMessage(queue string, data map[string]string, maxLen int64, trimImmediately bool) string {
 	cli := r.getClient()
 	args := &redis.XAddArgs{
 		Stream: queue,
 		Values: data,
-		ID: "*",
+		ID:     "*",
 		MaxLen: maxLen,
 		Approx: !trimImmediately,
 	}
