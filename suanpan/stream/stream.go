@@ -144,7 +144,7 @@ func (s *Stream) subscribe() <-chan Request {
 					glog.Errorf("Message regex match error: %v", err)
 				}
 				if match {
-					req.Data = v
+					req.Data = v.(string)
 				}
 			}
 			reqs <- req

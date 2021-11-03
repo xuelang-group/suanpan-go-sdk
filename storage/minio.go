@@ -108,7 +108,7 @@ func (m *MinioStorage) DeleteMultiObjects(objectNames []string) error {
 		return err
 	}
 
-	objectsCh := make(chan string, len(objectNames))
+	objectsCh := make(chan string, 0)
 	defer close(objectsCh)
 	for _, o := range objectNames {
 		objectsCh <- o

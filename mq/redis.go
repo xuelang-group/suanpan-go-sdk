@@ -31,12 +31,12 @@ func (r *RedisMq) recvMessages(queue, group, consumer, consumeID string) []Queue
 		glog.Errorf("Read redis group failed: %v", err)
 	}
 
-	messages := make([]QueueMessage, len(res))
+	messages := make([]QueueMessage, 0)
 	for _, x := range res {
 		for _, m := range x.Messages {
 			messages = append(messages, QueueMessage{
 				ID:    m.ID,
-				Data:  func() interface{} { return m.Values }().(map[string]string),
+				Data:  m.Values,
 				Queue: x.Stream,
 				Group: group,
 			})
@@ -66,12 +66,12 @@ func (r *RedisMq) createQueue(queue, group, consumeID string) {
 	}
 }
 
-func (r *RedisMq) SubscribeQueue(queue, group, consumer string) <-chan map[string]string {
+func (r *RedisMq) SubscribeQueue(queue, group, consumer string) <-chan map[string]interface{} {
 	cli := r.getClient()
 	r.createQueue(queue, group, "0")
 	glog.Info("Subscribing message")
 
-	msg := make(chan map[string]string)
+	msg := make(chan map[string]interface{})
 
 	go func() {
 		for {
