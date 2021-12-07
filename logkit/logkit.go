@@ -2,6 +2,7 @@ package logkit
 
 import (
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/golang/glog"
@@ -22,15 +23,19 @@ func getSio() (*socketio.Conn, error) {
 	if u.Scheme == "https" {
 		schemeOpt = socketio.WithScheme("wss")
 	}
-	pathOpt := socketio.WithPath(e.SpLogkitPath)
+	path := e.SpLogkitPath
+	if !strings.HasSuffix(path, `/`) {
+		path = path + `/`
+	}
+	pathOpt := socketio.WithPath(path)
 	socketio.GetURL(u.Host, schemeOpt, pathOpt)
 
 	headerOpt := socketio.WithHeader(web.GetHeaders())
-	namespaceOPt := socketio.WithNamespace(e.SpLogkitNamespace)
+	namespaceOpt := socketio.WithNamespace(e.SpLogkitNamespace)
 
 	u = socketio.GetURL(u.Host, schemeOpt, pathOpt)
 
-	return socketio.New(u.String(), headerOpt, namespaceOPt)
+	return socketio.New(u.String(), headerOpt, namespaceOpt)
 }
 
 func EmitEventLog(title string, level LogLevel) {
