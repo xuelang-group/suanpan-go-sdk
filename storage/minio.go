@@ -7,6 +7,7 @@ import (
 	"github.com/golang/glog"
 	"github.com/mcuadros/go-defaults"
 	"github.com/minio/minio-go"
+	"github.com/xuelang-group/suanpan-go-sdk/util"
 )
 
 type MinioStorage struct {
@@ -81,8 +82,8 @@ func (m *MinioStorage) ListObjects(objectPrefix string, recursive bool, maxKeys 
 	objects := make([]ObjectItem, 0)
 	for o := range cli.ListObjectsV2(m.StorageMinioBucketName, objectPrefix, recursive, doneCh) {
 		objects = append(objects, ObjectItem{
-			Name: o.Key,
-			LastModified: ISOString(o.LastModified),
+			Name:         o.Key,
+			LastModified: util.ISOString(o.LastModified),
 		})
 		if len(objects) >= maxKeys {
 			doneCh <- struct{}{}

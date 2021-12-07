@@ -1,4 +1,4 @@
-package backend
+package web
 
 import (
 	"crypto/hmac"
@@ -15,12 +15,12 @@ func signatureV1(secret, data string) string {
 	return base64.StdEncoding.EncodeToString(mac.Sum(nil))
 }
 
-func GetHeaders() map[string]string {
+func GetHeaders() map[string][]string {
 	env := config.GetEnv()
-	headers := make(map[string]string)
-	headers[env.SpUserIdHeaderField] = env.SpUserId
-	headers[env.SpUserSignatureHeaderField] = signatureV1(env.SpAccessSecret, env.SpUserId)
-	headers[env.SpUserSignVersionHeaderField] = "v1"
+	headers := make(map[string][]string)
+	headers[env.SpUserIdHeaderField] = []string{env.SpUserId}
+	headers[env.SpUserSignatureHeaderField] = []string{signatureV1(env.SpAccessSecret, env.SpUserId)}
+	headers[env.SpUserSignVersionHeaderField] = []string{"v1"}
 
 	return headers
 }

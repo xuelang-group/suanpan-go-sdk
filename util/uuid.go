@@ -1,4 +1,4 @@
-package stream
+package util
 
 import "github.com/satori/go.uuid"
 

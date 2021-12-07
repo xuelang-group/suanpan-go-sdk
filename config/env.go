@@ -28,6 +28,11 @@ type Env struct {
 	SpUserIdHeaderField          string `envconfig:"SP_USER_ID_HEADER_FIELD" default:"x-sp-user-id"`
 	SpUserSignatureHeaderField   string `envconfig:"SP_USER_SIGNATURE_HEADER_FIELD" default:"x-sp-signature"`
 	SpUserSignVersionHeaderField string `envconfig:"SP_USER_SIGN_VERSION_HEADER_FIELD" default:"x-sp-sign-version"`
+	SpLogkitUri                  string `envconfig:"SP_LOGKIT_URI"`
+	SpLogkitNamespace            string `envconfig:"SP_LOGKIT_NAMESPACE" default:"/logkit"`
+	SpLogkitPath                 string `envconfig:"SP_LOGKIT_PATH"`
+	SpLogkitEventsAppend         string `envconfig:"SP_LOGKIT_EVENTS_APPEND" default:"append"`
+	SpLogkitLogsLevel            string `envconfig:"SP_LOGKIT_LOGS_LEVEL" default:"warning"`
 }
 
 func GetEnv() *Env {
