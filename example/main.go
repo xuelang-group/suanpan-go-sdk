@@ -2,11 +2,12 @@ package main
 
 import (
 	// "encoding/json"
-	"github.com/xuelang-group/suanpan-go-sdk/logkit"
+	"github.com/xuelang-group/suanpan-go-sdk/suanpan/log"
 	"github.com/xuelang-group/suanpan-go-sdk/suanpan/stream"
 )
 
 func handle(r stream.Request) {
+	log.Info("receive request data")
 	// m := make(map[string]string)
 	// _ = json.Unmarshal([]byte(r.Data), &m)
 	// m["hello"] = "world"
@@ -19,8 +20,6 @@ func handle(r stream.Request) {
 }
 
 func main() {
-	logkit.EmitEventLog("test", logkit.DEBUG)
-
 	reqs := stream.Subscribe()
 
 	forever := make(chan struct{})

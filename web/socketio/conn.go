@@ -2,11 +2,10 @@ package socketio
 
 import (
 	"bytes"
-	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -21,14 +20,7 @@ type Conn struct {
 	pingInterval time.Duration
 	pingTimeout  time.Duration
 
-	timeout chan struct{}
-
-	pingCancel context.CancelFunc
-
-	timeoutLock   sync.Mutex
-	timeoutCancel context.CancelFunc
-
-	isConnected bool
+	namespace string
 }
 
 type ConnOptions struct {
@@ -98,8 +90,7 @@ func New(urlStr string, opts ...ConnOption) (*Conn, error) {
 		wch:          wch,
 		pingInterval: time.Duration(session.PingInterval) * time.Millisecond,
 		pingTimeout:  time.Duration(session.PingTimeout) * time.Millisecond,
-		timeout:      make(chan struct{}),
-		isConnected:  true,
+		namespace:    options.Namespace,
 	}
 
 	err = c.ConnectNamespace(options.Namespace)
@@ -149,10 +140,23 @@ func (c *Conn) NewWriter(p []byte) *ioutil.Writer {
 	return w
 }
 
-func (c *Conn) IsConnected() bool {
-	return c.isConnected
-}
+func (c *Conn) Emit(args ...interface{}) error {
+	p := &Packet{
+		Type:      EVENT,
+		Namespace: c.namespace,
+		ID:        -1,
+	}
+	w := c.NewWriter(engineio.MessagePrefix())
+	if err := NewEncoder(w).Encode(p); err != nil {
+		return fmt.Errorf("encode header: %w", err)
+	}
 
-func (c *Conn) Emit() {
-
+	b, err := json.Marshal([]interface{}{args})
+	if err != nil {
+		return err
+	}
+	w.Write(b)
+	w.Flush()
+	_, err = c.NextReader()
+	return err
 }

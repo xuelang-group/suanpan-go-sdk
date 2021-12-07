@@ -32,7 +32,7 @@ func (m *MinioStorage) getClient() (*minio.Client, error) {
 		m.StorageMinioEndpoint, m.StorageMinioAccessId,
 		m.StorageMinioAccessKey, b)
 	if err != nil {
-		glog.Errorf("Init minio client error: %v", err)
+		glog.Errorf("Init minio client error: %w", err)
 		return nil, err
 	}
 
@@ -117,7 +117,7 @@ func (m *MinioStorage) DeleteMultiObjects(objectNames []string) error {
 
 	go func() {
 		for err := range cli.RemoveObjects(m.StorageMinioBucketName, objectsCh) {
-			glog.Errorf("Remove object error: %v", err)
+			glog.Errorf("Remove object error: %w", err)
 		}
 	}()
 

@@ -2,7 +2,6 @@ package logkit
 
 import (
 	"net/url"
-	"sync"
 	"time"
 
 	"github.com/golang/glog"
@@ -12,30 +11,11 @@ import (
 	"github.com/xuelang-group/suanpan-go-sdk/web/socketio"
 )
 
-var (
-	sio *socketio.Conn
-	mu sync.Mutex
-)
-
-func GetSio() *socketio.Conn {
-	mu.Lock()
-	defer mu.Unlock()
-
-	if !sio.IsConnected() {
-		s, err := buildSio()
-		if err == nil {
-			sio = s
-		}
-	}
-
-	return sio
-}
-
-func buildSio() (*socketio.Conn, error) {
+func getSio() (*socketio.Conn, error) {
 	e := config.GetEnv()
 	u, err := url.Parse(e.SpLogkitUri)
 	if err != nil {
-		glog.Errorf("parse url error: %w", err)
+		glog.Errorf("Parse url error: %w", err)
 		return nil, err
 	}
 	schemeOpt := socketio.WithScheme("ws")
@@ -53,10 +33,12 @@ func buildSio() (*socketio.Conn, error) {
 	return socketio.New(u.String(), headerOpt, namespaceOPt)
 }
 
-func EmitEventLog(title string, level LogLevel)  {
-	sio.NextReader()
-	//client := web.GetSocketioClient()
-	//client.Emit(config.GetEnv().SpLogkitEventsAppend, buildEventLog(title, level))
+func EmitEventLog(title string, level LogLevel) {
+	sio, err := getSio()
+	if err != nil {
+		glog.Errorf("Get sio error: %w", err)
+	}
+	sio.Emit(buildEventLog(title, level))
 }
 
 func buildEventLog(title string, level LogLevel) EventLog {
