@@ -160,3 +160,8 @@ func (c *Conn) Emit(args ...interface{}) error {
 	_, err = c.NextReader()
 	return err
 }
+
+func (c *Conn) Close() error {
+	close(c.wch)
+	return c.ws.Close()
+}

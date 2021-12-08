@@ -40,6 +40,8 @@ func getSio() (*socketio.Conn, error) {
 
 func EmitEventLog(title string, level LogLevel) {
 	sio, err := getSio()
+	defer sio.Close()
+
 	if err != nil {
 		glog.Errorf("Get sio error: %w", err)
 	}
