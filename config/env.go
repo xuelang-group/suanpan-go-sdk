@@ -24,6 +24,7 @@ type Env struct {
 	SpOs                         string `envconfig:"SP_OS" default:"kubernetes"`
 	SpPort                       string `envconfig:"SP_PORT" default:"7000"`
 	SpUserId                     string `envconfig:"SP_USER_ID" validate:"required"`
+	SpAppId                      string `envconfig:"SP_APP_ID" validate:"required"`
 	SpAccessSecret               string `envconfig:"SP_ACCESS_SECRET" validate:"required"`
 	SpUserIdHeaderField          string `envconfig:"SP_USER_ID_HEADER_FIELD" default:"x-sp-user-id"`
 	SpUserSignatureHeaderField   string `envconfig:"SP_USER_SIGNATURE_HEADER_FIELD" default:"x-sp-signature"`

@@ -43,16 +43,21 @@ func EmitEventLog(title string, level LogLevel) {
 	if err != nil {
 		glog.Errorf("Get sio error: %w", err)
 	}
-	sio.Emit(buildEventLog(title, level))
+	e := buildEvent(title, level)
+	sio.Emit(e.Name, e.AppID, e.Log)
 }
 
-func buildEventLog(title string, level LogLevel) EventLog {
-	return EventLog{
-		Title: title,
-		Level: level.String(),
-		Time:  util.ISOString(time.Now()),
-		Data: Data{
-			Node: config.GetEnv().SpNodeId,
+func buildEvent(title string, level LogLevel) Event {
+	return Event{
+		Name: config.GetEnv().SpLogkitEventsAppend,
+		AppID: config.GetEnv().SpAppId,
+		Log: EventLog{
+			Title: title,
+			Level: level.String(),
+			Time:  util.ISOString(time.Now()),
+			Data: Data{
+				Node: config.GetEnv().SpNodeId,
+			},
 		},
 	}
 }

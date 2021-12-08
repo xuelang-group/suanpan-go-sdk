@@ -27,5 +27,5 @@ func MessagePrefix() []byte {
 }
 
 func Prefix(packetType PacketType) []byte {
-	return []byte{byte(packetType)}
+	return []byte{byte(packetType) + '0'}
 }

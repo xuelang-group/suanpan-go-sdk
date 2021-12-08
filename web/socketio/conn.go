@@ -151,7 +151,7 @@ func (c *Conn) Emit(args ...interface{}) error {
 		return fmt.Errorf("encode header: %w", err)
 	}
 
-	b, err := json.Marshal([]interface{}{args})
+	b, err := json.Marshal(args)
 	if err != nil {
 		return err
 	}
