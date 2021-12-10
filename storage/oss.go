@@ -5,7 +5,8 @@ import (
 
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"github.com/golang/glog"
-	"github.com/xuelang-group/suanpan-go-sdk/backend"
+	"github.com/xuelang-group/suanpan-go-sdk/util"
+	"github.com/xuelang-group/suanpan-go-sdk/web"
 )
 
 type OssStorage struct {
@@ -18,7 +19,7 @@ type OssStorage struct {
 }
 
 func (o *OssStorage) getBucket() (*oss.Bucket, error) {
-	resp, err := backend.GetStsTokenResp()
+	resp, err := web.GetStsTokenResp()
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +32,7 @@ func (o *OssStorage) getBucket() (*oss.Bucket, error) {
 
 	bucket, err := cli.Bucket(o.StorageOssBucketName)
 	if err != nil {
-		glog.Errorf("Get oss bucket error: %v", err)
+		glog.Errorf("Get oss bucket error: %w", err)
 		return nil, err
 	}
 
@@ -78,15 +79,15 @@ func (o *OssStorage) ListObjects(objectPrefix string, recursive bool, maxKeys in
 
 	res, err := bucket.ListObjectsV2(oss.Prefix(objectPrefix), oss.MaxKeys(maxKeys), delimiter)
 	if err != nil {
-		glog.Errorf("List oss objects error: %v", err)
+		glog.Errorf("List oss objects error: %w", err)
 		return nil, err
 	}
 
 	objects := make([]ObjectItem, 0)
 	for _, o := range res.Objects {
 		objects = append(objects, ObjectItem{
-			Name: o.Key,
-			LastModified: ISOString(o.LastModified),
+			Name:         o.Key,
+			LastModified: util.ISOString(o.LastModified),
 		})
 	}
 

@@ -34,3 +34,15 @@ storage.ListObjects(prefix)
 storage.DeleteObject(objectName)
 storage.DeleteMultiObjects(objectNames)
 ```
+
+### 4. Log Api
+
+```go
+import "github.com/xuelang-group/suanpan-go-sdk/suanpan/log"
+
+log.Trace("trace message")
+log.Debug("debug message")
+log.Info("info message")
+log.Warn("warn message")
+log.Error("error message")
+```

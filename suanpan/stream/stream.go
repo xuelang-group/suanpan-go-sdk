@@ -10,6 +10,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/xuelang-group/suanpan-go-sdk/config"
 	"github.com/xuelang-group/suanpan-go-sdk/mq"
+	"github.com/xuelang-group/suanpan-go-sdk/util"
 )
 
 const (
@@ -101,7 +102,7 @@ func Send(data map[string]string) string {
 func SendSuccess(data map[string]string) string {
 	s := getStream()
 	data["success"] = "true"
-	data["request_id"] = GenerateUUID()
+	data["request_id"] = util.GenerateUUID()
 	data["node_id"] = config.GetEnv().SpNodeId
 	return s.send(data)
 }
@@ -109,7 +110,7 @@ func SendSuccess(data map[string]string) string {
 func SendFailure(data map[string]string) string {
 	s := getStream()
 	data["success"] = "false"
-	data["request_id"] = GenerateUUID()
+	data["request_id"] = util.GenerateUUID()
 	data["node_id"] = config.GetEnv().SpNodeId
 	return s.send(data)
 }
@@ -141,7 +142,7 @@ func (s *Stream) subscribe() <-chan Request {
 			for k, v := range msg {
 				match, err := regexp.MatchString(InputPattern, k)
 				if err != nil {
-					glog.Errorf("Message regex match error: %v", err)
+					glog.Errorf("Message regex match error: %w", err)
 				}
 				if match {
 					req.Data = v.(string)

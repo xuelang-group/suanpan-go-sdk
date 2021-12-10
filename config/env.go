@@ -24,10 +24,16 @@ type Env struct {
 	SpOs                         string `envconfig:"SP_OS" default:"kubernetes"`
 	SpPort                       string `envconfig:"SP_PORT" default:"7000"`
 	SpUserId                     string `envconfig:"SP_USER_ID" validate:"required"`
+	SpAppId                      string `envconfig:"SP_APP_ID" validate:"required"`
 	SpAccessSecret               string `envconfig:"SP_ACCESS_SECRET" validate:"required"`
 	SpUserIdHeaderField          string `envconfig:"SP_USER_ID_HEADER_FIELD" default:"x-sp-user-id"`
 	SpUserSignatureHeaderField   string `envconfig:"SP_USER_SIGNATURE_HEADER_FIELD" default:"x-sp-signature"`
 	SpUserSignVersionHeaderField string `envconfig:"SP_USER_SIGN_VERSION_HEADER_FIELD" default:"x-sp-sign-version"`
+	SpLogkitUri                  string `envconfig:"SP_LOGKIT_URI"`
+	SpLogkitNamespace            string `envconfig:"SP_LOGKIT_NAMESPACE" default:"/logkit"`
+	SpLogkitPath                 string `envconfig:"SP_LOGKIT_PATH"`
+	SpLogkitEventsAppend         string `envconfig:"SP_LOGKIT_EVENTS_APPEND" default:"append"`
+	SpLogkitLogsLevel            string `envconfig:"SP_LOGKIT_LOGS_LEVEL" default:"warning"`
 }
 
 func GetEnv() *Env {
@@ -41,14 +47,14 @@ func GetEnv() *Env {
 func buildEnv() *Env {
 	err := envconfig.Process("config", e)
 	if err != nil {
-		glog.Errorf("Decode env variables failed: %v", err)
+		glog.Errorf("Decode env variables failed: %w", err)
 	}
 
 	defaults.SetDefaults(e)
 	validate := validator.New()
 	err = validate.Struct(e)
 	if err != nil {
-		glog.Errorf("Validate env variables failed: %v", err)
+		glog.Errorf("Validate env variables failed: %w", err)
 	}
 
 	return e

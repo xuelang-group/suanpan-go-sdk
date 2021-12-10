@@ -30,7 +30,7 @@ func buildArgs() map[string]string {
 	e := GetEnv()
 	params, err := base64.StdEncoding.DecodeString(e.SpParam)
 	if err != nil {
-		glog.Errorf("Decode sp param failed: %v", err)
+		glog.Errorf("Decode sp param failed: %w", err)
 		return nil
 	}
 

@@ -26,9 +26,9 @@ func (r *RedisMq) recvMessages(queue, group, consumer, consumeID string) []Queue
 		Consumer: consumer,
 		Streams:  []string{queue, consumeID},
 	}
-	res, err := cli.XReadGroup(context.TODO(), args).Result()
+	res, err := cli.XReadGroup(context.Background(), args).Result()
 	if err != nil {
-		glog.Errorf("Read redis group failed: %v", err)
+		glog.Errorf("Read redis group failed: %w", err)
 	}
 
 	messages := make([]QueueMessage, 0)
@@ -50,8 +50,8 @@ func (r *RedisMq) recvMessages(queue, group, consumer, consumeID string) []Queue
 		return m.ID
 	}).([]string)
 	if len(lostMessages) > 0 {
-		cli.XAck(context.TODO(), queue, group, lostMessageIDs...)
-		glog.Warningf("Messages have lost: %v", lostMessageIDs)
+		cli.XAck(context.Background(), queue, group, lostMessageIDs...)
+		glog.Warningf("Messages have lost: %w", lostMessageIDs)
 	}
 
 	return messages
@@ -60,9 +60,9 @@ func (r *RedisMq) recvMessages(queue, group, consumer, consumeID string) []Queue
 func (r *RedisMq) createQueue(queue, group, consumeID string) {
 	cli := r.getClient()
 	glog.Infof("Create queue %s-%s", queue, group)
-	err := cli.XGroupCreateMkStream(context.TODO(), queue, group, consumeID).Err()
+	err := cli.XGroupCreateMkStream(context.Background(), queue, group, consumeID).Err()
 	if err != nil {
-		glog.Warningf("Create redis queue error: %v", err)
+		glog.Warningf("Create redis queue error: %w", err)
 	}
 }
 
@@ -78,7 +78,7 @@ func (r *RedisMq) SubscribeQueue(queue, group, consumer string) <-chan map[strin
 			messages := r.recvMessages(queue, group, consumer, ">")
 			for _, message := range messages {
 				msg <- message.Data
-				cli.XAck(context.TODO(), queue, group, message.ID)
+				cli.XAck(context.Background(), queue, group, message.ID)
 			}
 		}
 	}()
@@ -95,9 +95,9 @@ func (r *RedisMq) SendMessage(queue string, data map[string]string, maxLen int64
 		MaxLen: maxLen,
 		Approx: !trimImmediately,
 	}
-	id, err := cli.XAdd(context.TODO(), args).Result()
+	id, err := cli.XAdd(context.Background(), args).Result()
 	if err != nil {
-		glog.Errorf("Send redis message failed: %v", err)
+		glog.Errorf("Send redis message failed: %w", err)
 	}
 
 	return id
