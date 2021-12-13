@@ -5,7 +5,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/golang/glog"
+	"github.com/xuelang-group/suanpan-go-sdk/suanpan/log"
 )
 
 var (
@@ -30,7 +30,7 @@ func buildArgs() map[string]string {
 	e := GetEnv()
 	params, err := base64.StdEncoding.DecodeString(e.SpParam)
 	if err != nil {
-		glog.Errorf("Decode sp param failed: %w", err)
+		log.Errorf("Decode sp param failed: %w", err)
 		return nil
 	}
 

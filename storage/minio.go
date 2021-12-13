@@ -4,9 +4,9 @@ import (
 	"io"
 	"strconv"
 
-	"github.com/golang/glog"
 	"github.com/mcuadros/go-defaults"
 	"github.com/minio/minio-go"
+	"github.com/xuelang-group/suanpan-go-sdk/suanpan/log"
 	"github.com/xuelang-group/suanpan-go-sdk/util"
 )
 
@@ -24,7 +24,7 @@ func (m *MinioStorage) getClient() (*minio.Client, error) {
 	defaults.SetDefaults(&minioStorage)
 	b, err := strconv.ParseBool(m.StorageMinioSecure)
 	if err != nil {
-		glog.Warningf("StorageMinioSecure is not a valid bool value: %s", m.StorageMinioSecure)
+		log.Warnf("StorageMinioSecure is not a valid bool value: %s", m.StorageMinioSecure)
 		b = false
 	}
 
@@ -32,7 +32,7 @@ func (m *MinioStorage) getClient() (*minio.Client, error) {
 		m.StorageMinioEndpoint, m.StorageMinioAccessId,
 		m.StorageMinioAccessKey, b)
 	if err != nil {
-		glog.Errorf("Init minio client error: %w", err)
+		log.Errorf("Init minio client error: %w", err)
 		return nil, err
 	}
 
@@ -55,7 +55,7 @@ func (m *MinioStorage) FPutObject(objectName, filePath string) error {
 	}
 
 	n, err := cli.FPutObject(m.StorageMinioBucketName, objectName, filePath, minio.PutObjectOptions{})
-	glog.Infof("Uploaded %d bytes", n)
+	log.Infof("Uploaded %d bytes", n)
 	return err
 }
 
@@ -66,7 +66,7 @@ func (m *MinioStorage) PutObject(objectName string, reader io.Reader) error {
 	}
 
 	n, err := cli.PutObject(m.StorageMinioBucketName, objectName, reader, -1, minio.PutObjectOptions{})
-	glog.Infof("Uploaded %d bytes", n)
+	log.Infof("Uploaded %d bytes", n)
 	return err
 }
 
@@ -117,7 +117,7 @@ func (m *MinioStorage) DeleteMultiObjects(objectNames []string) error {
 
 	go func() {
 		for err := range cli.RemoveObjects(m.StorageMinioBucketName, objectsCh) {
-			glog.Errorf("Remove object error: %w", err)
+			log.Errorf("Remove object error: %w", err)
 		}
 	}()
 

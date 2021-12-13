@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/golang/glog"
+	"github.com/sirupsen/logrus"
 	"github.com/xuelang-group/suanpan-go-sdk/config"
 	"github.com/xuelang-group/suanpan-go-sdk/util"
 	"github.com/xuelang-group/suanpan-go-sdk/web"
@@ -16,7 +16,7 @@ func getSio() (*socketio.Conn, error) {
 	e := config.GetEnv()
 	u, err := url.Parse(e.SpLogkitUri)
 	if err != nil {
-		glog.Errorf("Parse url error: %w", err)
+		logrus.Errorf("Parse url error: %w", err)
 		return nil, err
 	}
 	schemeOpt := socketio.WithScheme("ws")
@@ -43,7 +43,7 @@ func EmitEventLog(title string, level LogLevel) {
 	defer sio.Close()
 
 	if err != nil {
-		glog.Errorf("Get sio error: %w", err)
+		logrus.Errorf("Get sio error: %w", err)
 	}
 	e := buildEvent(title, level)
 	sio.Emit(e.Name, e.AppID, e.Log)

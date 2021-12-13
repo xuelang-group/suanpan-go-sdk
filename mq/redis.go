@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/golang/glog"
 	"github.com/thoas/go-funk"
+	"github.com/xuelang-group/suanpan-go-sdk/suanpan/log"
 )
 
 type RedisMq struct {
@@ -28,7 +28,7 @@ func (r *RedisMq) recvMessages(queue, group, consumer, consumeID string) []Queue
 	}
 	res, err := cli.XReadGroup(context.Background(), args).Result()
 	if err != nil {
-		glog.Errorf("Read redis group failed: %w", err)
+		log.Errorf("Read redis group failed: %w", err)
 	}
 
 	messages := make([]QueueMessage, 0)
@@ -51,7 +51,7 @@ func (r *RedisMq) recvMessages(queue, group, consumer, consumeID string) []Queue
 	}).([]string)
 	if len(lostMessages) > 0 {
 		cli.XAck(context.Background(), queue, group, lostMessageIDs...)
-		glog.Warningf("Messages have lost: %w", lostMessageIDs)
+		log.Warnf("Messages have lost: %w", lostMessageIDs)
 	}
 
 	return messages
@@ -59,17 +59,17 @@ func (r *RedisMq) recvMessages(queue, group, consumer, consumeID string) []Queue
 
 func (r *RedisMq) createQueue(queue, group, consumeID string) {
 	cli := r.getClient()
-	glog.Infof("Create queue %s-%s", queue, group)
+	log.Infof("Create queue %s-%s", queue, group)
 	err := cli.XGroupCreateMkStream(context.Background(), queue, group, consumeID).Err()
 	if err != nil {
-		glog.Warningf("Create redis queue error: %w", err)
+		log.Warnf("Create redis queue error: %w", err)
 	}
 }
 
 func (r *RedisMq) SubscribeQueue(queue, group, consumer string) <-chan map[string]interface{} {
 	cli := r.getClient()
 	r.createQueue(queue, group, "0")
-	glog.Info("Subscribing message")
+	log.Info("Subscribing message")
 
 	msg := make(chan map[string]interface{})
 
@@ -97,7 +97,7 @@ func (r *RedisMq) SendMessage(queue string, data map[string]string, maxLen int64
 	}
 	id, err := cli.XAdd(context.Background(), args).Result()
 	if err != nil {
-		glog.Errorf("Send redis message failed: %w", err)
+		log.Errorf("Send redis message failed: %w", err)
 	}
 
 	return id

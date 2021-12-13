@@ -4,9 +4,9 @@ import (
 	"sync"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/golang/glog"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/mcuadros/go-defaults"
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -33,7 +33,15 @@ type Env struct {
 	SpLogkitNamespace            string `envconfig:"SP_LOGKIT_NAMESPACE" default:"/logkit"`
 	SpLogkitPath                 string `envconfig:"SP_LOGKIT_PATH"`
 	SpLogkitEventsAppend         string `envconfig:"SP_LOGKIT_EVENTS_APPEND" default:"append"`
-	SpLogkitLogsLevel            string `envconfig:"SP_LOGKIT_LOGS_LEVEL" default:"warning"`
+	SpLogkitLogsLevel            string `envconfig:"SP_LOGKIT_LOGS_LEVEL" default:"info"`
+}
+
+func init() {
+	logrus.SetReportCaller(true)
+	logrus.SetFormatter(&logrus.TextFormatter{
+		DisableColors:true,
+		TimestampFormat:"2006-01-02 15:03:04",
+	})
 }
 
 func GetEnv() *Env {
@@ -47,14 +55,14 @@ func GetEnv() *Env {
 func buildEnv() *Env {
 	err := envconfig.Process("config", e)
 	if err != nil {
-		glog.Errorf("Decode env variables failed: %w", err)
+		logrus.Errorf("Decode env variables failed: %w", err)
 	}
 
 	defaults.SetDefaults(e)
 	validate := validator.New()
 	err = validate.Struct(e)
 	if err != nil {
-		glog.Errorf("Validate env variables failed: %w", err)
+		logrus.Errorf("Validate env variables failed: %w", err)
 	}
 
 	return e
