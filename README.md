@@ -41,8 +41,13 @@ storage.DeleteMultiObjects(objectNames)
 import "github.com/xuelang-group/suanpan-go-sdk/suanpan/log"
 
 log.Trace("trace message")
+log.Tracef("trace message: %s", msg)
 log.Debug("debug message")
+log.Debugf("debug message: %s", msg)
 log.Info("info message")
+log.Infof("info message: %s", msg)
 log.Warn("warn message")
+log.Warnf("warn message: %s", msg)
 log.Error("error message")
+log.Errorf("error message: %s", msg)
 ```
