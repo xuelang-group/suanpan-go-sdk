@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/golang/glog"
 	"github.com/xuelang-group/suanpan-go-sdk/config"
+	"github.com/xuelang-group/suanpan-go-sdk/suanpan/log"
 )
 
 const (
@@ -43,7 +43,7 @@ func getHttpServerUrl() string {
 func buildHttpServerUrl() string {
 	b, err := strconv.ParseBool(config.GetEnv().SpHostTls)
 	if err != nil {
-		glog.Warningf("SpHostTls is not a valid bool value: %s", config.GetEnv().SpHostTls)
+		log.Warnf("SpHostTls is not a valid bool value: %s", config.GetEnv().SpHostTls)
 		b = false
 	}
 	protocol := `http`
@@ -65,21 +65,21 @@ func GetStsTokenResp() (*StsTokenResp, error) {
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		glog.Errorf("Request sts token error: %w", err)
+		log.Errorf("Request sts token error: %w", err)
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		glog.Errorf("Read response body error: %w", err)
+		log.Errorf("Read response body error: %w", err)
 		return nil, err
 	}
 
 	var stsTokenResp *StsTokenResp
 	err = json.Unmarshal(data, &stsTokenResp)
 	if err != nil {
-		glog.Errorf("Unmarshal json format error: %w", err)
+		log.Errorf("Unmarshal json format error: %w", err)
 	}
 
 	return stsTokenResp, nil

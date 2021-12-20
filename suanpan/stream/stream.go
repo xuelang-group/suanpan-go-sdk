@@ -5,11 +5,11 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/golang/glog"
 	"github.com/mcuadros/go-defaults"
 	"github.com/mitchellh/mapstructure"
 	"github.com/xuelang-group/suanpan-go-sdk/config"
 	"github.com/xuelang-group/suanpan-go-sdk/mq"
+	"github.com/xuelang-group/suanpan-go-sdk/suanpan/log"
 	"github.com/xuelang-group/suanpan-go-sdk/util"
 )
 
@@ -52,19 +52,19 @@ func buildStream() *Stream {
 
 	sendQueue := envStream.StreamSendQueue
 	if sendQueue == "" {
-		glog.Warning("StreamSendQueue is empty")
+		log.Warn("StreamSendQueue is empty")
 		sendQueue = "mq-" + config.GetEnv().SpNodeId
 	}
 
 	maxLen, err := strconv.ParseInt(envStream.StreamSendQueueMaxLength, 10, 64)
 	if err != nil {
-		glog.Errorf("StreamSendQueueMaxLength is not a valid int64 value: %s", envStream.StreamSendQueueMaxLength)
+		log.Errorf("StreamSendQueueMaxLength is not a valid int64 value: %s", envStream.StreamSendQueueMaxLength)
 		maxLen = 1000
 	}
 
 	trimImmediately, err := strconv.ParseBool(envStream.StreamSendQueueTrimImmediately)
 	if err != nil {
-		glog.Errorf("StreamSendQueueTrimImmediately is not a valid bool value: %s", envStream.StreamSendQueueTrimImmediately)
+		log.Errorf("StreamSendQueueTrimImmediately is not a valid bool value: %s", envStream.StreamSendQueueTrimImmediately)
 		trimImmediately = false
 	}
 
@@ -142,7 +142,7 @@ func (s *Stream) subscribe() <-chan Request {
 			for k, v := range msg {
 				match, err := regexp.MatchString(InputPattern, k)
 				if err != nil {
-					glog.Errorf("Message regex match error: %w", err)
+					log.Errorf("Message regex match error: %w", err)
 				}
 				if match {
 					req.Data = v.(string)

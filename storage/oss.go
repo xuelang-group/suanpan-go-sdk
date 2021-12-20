@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
-	"github.com/golang/glog"
+	"github.com/xuelang-group/suanpan-go-sdk/suanpan/log"
 	"github.com/xuelang-group/suanpan-go-sdk/util"
 	"github.com/xuelang-group/suanpan-go-sdk/web"
 )
@@ -32,7 +32,7 @@ func (o *OssStorage) getBucket() (*oss.Bucket, error) {
 
 	bucket, err := cli.Bucket(o.StorageOssBucketName)
 	if err != nil {
-		glog.Errorf("Get oss bucket error: %w", err)
+		log.Errorf("Get oss bucket error: %w", err)
 		return nil, err
 	}
 
@@ -79,7 +79,7 @@ func (o *OssStorage) ListObjects(objectPrefix string, recursive bool, maxKeys in
 
 	res, err := bucket.ListObjectsV2(oss.Prefix(objectPrefix), oss.MaxKeys(maxKeys), delimiter)
 	if err != nil {
-		glog.Errorf("List oss objects error: %w", err)
+		log.Errorf("List oss objects error: %w", err)
 		return nil, err
 	}
 

@@ -1,9 +1,9 @@
 package mq
 
 import (
-	"github.com/golang/glog"
 	"github.com/mcuadros/go-defaults"
 	"github.com/mitchellh/mapstructure"
+	"github.com/xuelang-group/suanpan-go-sdk/suanpan/log"
 )
 
 const (
@@ -30,7 +30,7 @@ func New(argsMap map[string]string) Mq {
 		defaults.SetDefaults(&redisMq)
 		return &redisMq
 	default:
-		glog.Errorf("Unsupported mq type: %s", envMq.MqType)
+		log.Errorf("Unsupported mq type: %s", envMq.MqType)
 		return nil
 	}
 }

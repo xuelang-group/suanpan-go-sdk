@@ -3,9 +3,9 @@ package storage
 import (
 	"io"
 
-	"github.com/golang/glog"
 	"github.com/mcuadros/go-defaults"
 	"github.com/mitchellh/mapstructure"
+	"github.com/xuelang-group/suanpan-go-sdk/suanpan/log"
 )
 
 type Storage interface {
@@ -42,7 +42,7 @@ func New(argsMap map[string]string) Storage {
 		defaults.SetDefaults(&ossStorage)
 		return &ossStorage
 	default:
-		glog.Errorf("Unsupported storage type: %s", envStorage.StorageType)
+		log.Errorf("Unsupported storage type: %s", envStorage.StorageType)
 		return nil
 	}
 }
