@@ -44,6 +44,7 @@ func EmitEventLog(title string, level LogLevel) {
 
 	if err != nil {
 		logrus.Errorf("Get sio error: %w", err)
+		return
 	}
 	e := buildEvent(title, level)
 	sio.Emit(e.Name, e.AppID, e.Log)
