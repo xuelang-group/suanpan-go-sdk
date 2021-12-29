@@ -1,6 +1,7 @@
 package logkit
 
 import (
+	"errors"
 	"net/url"
 	"strings"
 	"time"
@@ -14,6 +15,9 @@ import (
 
 func getSio() (*socketio.Conn, error) {
 	e := config.GetEnv()
+	if e.SpLogkitUri == "" {
+		return nil, errors.New("SpLogkitUri is empty")
+	}
 	u, err := url.Parse(e.SpLogkitUri)
 	if err != nil {
 		logrus.Errorf("Parse url error: %w", err)
@@ -40,12 +44,12 @@ func getSio() (*socketio.Conn, error) {
 
 func EmitEventLog(title string, level LogLevel) {
 	sio, err := getSio()
-	defer sio.Close()
-
 	if err != nil {
 		logrus.Errorf("Get sio error: %w", err)
 		return
 	}
+	defer sio.Close()
+
 	e := buildEvent(title, level)
 	sio.Emit(e.Name, e.AppID, e.Log)
 }

@@ -2,7 +2,7 @@ package storage
 
 import (
 	"io"
-	"strconv"
+	"net/url"
 
 	"github.com/mcuadros/go-defaults"
 	"github.com/minio/minio-go"
@@ -11,26 +11,25 @@ import (
 )
 
 type MinioStorage struct {
-	StorageMinioEndpoint   string `mapstructure:"--storage-minio-endpoint" default:"minio-service.default:9000"`
+	StorageMinioEndpoint   string `mapstructure:"--storage-minio-endpoint" default:"http://minio-service.default:9000"`
 	StorageMinioBucketName string `mapstructure:"--storage-minio-bucket-name" default:"suanpan"`
-	StorageMinioAccessId   string `mapstructure:"--storage-minio-access-id"`
-	StorageMinioAccessKey  string `mapstructure:"--storage-minio-access-key"`
+	StorageMinioAccessKey   string `mapstructure:"--storage-minio-access-key"`
+	StorageMinioSecretKey  string `mapstructure:"--storage-minio-secret-key"`
 	StorageMinioTempStore  string `mapstructure:"--storage-minio-temp-store"`
-	StorageMinioSecure     string `mapstructure:"--storage-minio-secure" default:"false"`
 }
 
 func (m *MinioStorage) getClient() (*minio.Client, error) {
 	var minioStorage MinioStorage
 	defaults.SetDefaults(&minioStorage)
-	b, err := strconv.ParseBool(m.StorageMinioSecure)
+	u, err := url.Parse(m.StorageMinioEndpoint)
 	if err != nil {
-		log.Warnf("StorageMinioSecure is not a valid bool value: %s", m.StorageMinioSecure)
-		b = false
+		log.Errorf("Parse StorageMinioEndpoint error: %w", err)
+		return nil, err
 	}
 
 	cli, err := minio.New(
-		m.StorageMinioEndpoint, m.StorageMinioAccessId,
-		m.StorageMinioAccessKey, b)
+		u.Host, m.StorageMinioAccessKey,
+		m.StorageMinioSecretKey, u.Scheme == "https")
 	if err != nil {
 		log.Errorf("Init minio client error: %w", err)
 		return nil, err
