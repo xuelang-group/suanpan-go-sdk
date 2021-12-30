@@ -13,7 +13,7 @@ import (
 type MinioStorage struct {
 	StorageMinioEndpoint   string `mapstructure:"--storage-minio-endpoint" default:"http://minio-service.default:9000"`
 	StorageMinioBucketName string `mapstructure:"--storage-minio-bucket-name" default:"suanpan"`
-	StorageMinioAccessKey   string `mapstructure:"--storage-minio-access-key"`
+	StorageMinioAccessKey  string `mapstructure:"--storage-minio-access-key"`
 	StorageMinioSecretKey  string `mapstructure:"--storage-minio-secret-key"`
 	StorageMinioTempStore  string `mapstructure:"--storage-minio-temp-store"`
 }
