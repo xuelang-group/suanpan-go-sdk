@@ -80,6 +80,9 @@ func (m *MinioStorage) ListObjects(objectPrefix string, recursive bool, maxKeys 
 
 	objects := make([]ObjectItem, 0)
 	for o := range cli.ListObjectsV2(m.StorageMinioBucketName, objectPrefix, recursive, doneCh) {
+		if o.Err != nil {
+			return nil, o.Err
+		}
 		objects = append(objects, ObjectItem{
 			Name:         o.Key,
 			LastModified: util.ISOString(o.LastModified),
