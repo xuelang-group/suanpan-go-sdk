@@ -2,7 +2,7 @@ package main
 
 import (
 	// "encoding/json"
-	"github.com/xuelang-group/suanpan-go-sdk/suanpan/log"
+	log "github.com/sirupsen/logrus"
 	"github.com/xuelang-group/suanpan-go-sdk/suanpan/stream"
 )
 

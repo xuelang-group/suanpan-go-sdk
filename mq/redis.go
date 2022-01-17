@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/go-redis/redis/v8"
+	log "github.com/sirupsen/logrus"
 	"github.com/thoas/go-funk"
-	"github.com/xuelang-group/suanpan-go-sdk/suanpan/log"
 )
 
 type RedisMq struct {
