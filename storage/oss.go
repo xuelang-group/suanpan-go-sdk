@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
-	"github.com/xuelang-group/suanpan-go-sdk/suanpan/log"
+	log "github.com/sirupsen/logrus"
 	"github.com/xuelang-group/suanpan-go-sdk/util"
 	"github.com/xuelang-group/suanpan-go-sdk/web"
 )

@@ -1,7 +1,6 @@
-package log
+package suanpan_log
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/sirupsen/logrus"
@@ -9,29 +8,23 @@ import (
 	"github.com/xuelang-group/suanpan-go-sdk/logkit"
 )
 
-var logLevel logkit.LogLevel
-
 func init() {
 	env := config.GetEnv()
+	level := logrus.WarnLevel
 	switch env.SpLogkitLogsLevel {
 	case "trace":
-		logrus.SetLevel(logrus.TraceLevel)
-		setLogLevel(logkit.TRACE)
+		level = logrus.TraceLevel
 	case "debug":
-		logrus.SetLevel(logrus.DebugLevel)
-		setLogLevel(logkit.DEBUG)
+		level = logrus.DebugLevel
 	case "info":
-		logrus.SetLevel(logrus.InfoLevel)
-		setLogLevel(logkit.INFO)
+		level = logrus.InfoLevel
 	case "warning", "warn":
-		logrus.SetLevel(logrus.WarnLevel)
-		setLogLevel(logkit.WARN)
+		level = logrus.WarnLevel
 	case "error":
-		logrus.SetLevel(logrus.ErrorLevel)
-		setLogLevel(logkit.ERROR)
+		level = logrus.ErrorLevel
 	default:
 		logrus.Errorf("unknown SpLogkitLogsLevel: %s", env.SpLogkitLogsLevel)
-		setLogLevel(logkit.INFO)
+		level = logrus.InfoLevel
 	}
 
 	b, err := strconv.ParseBool(env.SpDebug)
@@ -41,66 +34,35 @@ func init() {
 	}
 	if b {
 		logrus.SetLevel(logrus.DebugLevel)
-		setLogLevel(logkit.DEBUG)
+		level = logrus.DebugLevel
 	}
-}
 
-func Trace(title string) {
-	log(title, logkit.TRACE)
-	logrus.Trace(title)
-}
+	hook, err := NewSuanpanLogWithFunc("logkit", level, true, func(entry *logrus.Entry, hook *SuanpanLogHook) error {
+		level := logkit.INFO
+		switch entry.Level {
+		case logrus.TraceLevel:
+			level = logkit.TRACE
+		case logrus.DebugLevel:
+			level = logkit.DEBUG
+		case logrus.InfoLevel:
+			level = logkit.INFO
+		case logrus.WarnLevel:
+			level = logkit.WARN
+		case logrus.ErrorLevel:
+			level = logkit.ERROR
+		}
 
-func Tracef(format string, args ...interface{}) {
-	s := fmt.Sprintf(format, args)
-	Trace(s)
-}
+		//need async ? go log(msg, level)??
+		log(entry.Message, level)
+		return nil
+	})
 
-func Debug(title string) {
-	log(title, logkit.DEBUG)
-	logrus.Debug(title)
-}
-
-func Debugf(format string, args ...interface{}) {
-	s := fmt.Sprintf(format, args)
-	Debug(s)
-}
-
-func Info(title string) {
-	log(title, logkit.INFO)
-	logrus.Info(title)
-}
-
-func Infof(format string, args ...interface{}) {
-	s := fmt.Sprintf(format, args)
-	logrus.Info(s)
-}
-
-func Warn(title string) {
-	log(title, logkit.WARN)
-	logrus.Warn(title)
-}
-
-func Warnf(format string, args ...interface{}) {
-	s := fmt.Sprintf(format, args)
-	Warn(s)
-}
-
-func Error(title string) {
-	log(title, logkit.ERROR)
-	logrus.Error(title)
-}
-
-func Errorf(format string, args ...interface{}) {
-	s := fmt.Sprintf(format, args)
-	Error(s)
-}
-
-func setLogLevel(level logkit.LogLevel)  {
-	logLevel = level
+	if err != nil {
+		logrus.Error(err)
+	}
+	logrus.AddHook(hook)
 }
 
 func log(title string, level logkit.LogLevel) {
-	if level >= logLevel {
-		logkit.EmitEventLog(title, level)
-	}
+	logkit.EmitEventLog(title, level)
 }

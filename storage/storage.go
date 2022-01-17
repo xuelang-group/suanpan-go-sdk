@@ -5,7 +5,7 @@ import (
 
 	"github.com/mcuadros/go-defaults"
 	"github.com/mitchellh/mapstructure"
-	"github.com/xuelang-group/suanpan-go-sdk/suanpan/log"
+	log "github.com/sirupsen/logrus"
 )
 
 type Storage interface {
@@ -18,12 +18,12 @@ type Storage interface {
 }
 
 type EnvStorage struct {
-	StorageType	string	`mapstructure:"--storage-type" default:"minio"`
+	StorageType string `mapstructure:"--storage-type" default:"minio"`
 }
 
 const (
 	Minio = "minio"
-	Oss = "oss"
+	Oss   = "oss"
 )
 
 func New(argsMap map[string]string) Storage {
