@@ -3,7 +3,7 @@ package mq
 import (
 	"github.com/mcuadros/go-defaults"
 	"github.com/mitchellh/mapstructure"
-	"github.com/xuelang-group/suanpan-go-sdk/suanpan/log"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -11,12 +11,12 @@ const (
 )
 
 type Mq interface {
-	SendMessage(queue string, data map[string]string, maxLen int64, trimImmediately bool)	string
+	SendMessage(queue string, data map[string]string, maxLen int64, trimImmediately bool) string
 	SubscribeQueue(queue, group, consumer string) <-chan map[string]interface{}
 }
 
 type EnvMq struct {
-	MqType	string	`mapstructure:"--mq-type" default:"redis"`
+	MqType string `mapstructure:"--mq-type" default:"redis"`
 }
 
 func New(argsMap map[string]string) Mq {
