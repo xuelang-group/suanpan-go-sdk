@@ -81,6 +81,7 @@ func (m *MinioStorage) ListObjects(objectPrefix string, recursive bool, maxKeys 
 	objects := make([]ObjectItem, 0)
 	for o := range cli.ListObjectsV2(m.StorageMinioBucketName, objectPrefix, recursive, doneCh) {
 		if o.Err != nil {
+			log.Errorf("List objects error: %w", o.Err)
 			return nil, o.Err
 		}
 		objects = append(objects, ObjectItem{
