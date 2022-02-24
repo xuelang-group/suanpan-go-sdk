@@ -12,6 +12,12 @@ import (
 var logLevel logkit.LogLevel
 
 func init() {
+	logrus.SetReportCaller(true)
+	logrus.SetFormatter(&logrus.TextFormatter{
+		DisableColors:   true,
+		TimestampFormat: "2006-01-02 15:03:04",
+	})
+
 	env := config.GetEnv()
 	switch env.SpLogkitLogsLevel {
 	case "trace":
@@ -95,7 +101,7 @@ func Errorf(format string, args ...interface{}) {
 	Error(s)
 }
 
-func setLogLevel(level logkit.LogLevel)  {
+func setLogLevel(level logkit.LogLevel) {
 	logLevel = level
 }
 

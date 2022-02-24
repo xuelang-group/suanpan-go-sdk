@@ -36,14 +36,6 @@ type Env struct {
 	SpLogkitLogsLevel            string `envconfig:"SP_LOGKIT_LOGS_LEVEL" default:"info"`
 }
 
-func init() {
-	logrus.SetReportCaller(true)
-	logrus.SetFormatter(&logrus.TextFormatter{
-		DisableColors:true,
-		TimestampFormat:"2006-01-02 15:03:04",
-	})
-}
-
 func GetEnv() *Env {
 	envOnce.Do(func() {
 		e = buildEnv()

@@ -1,7 +1,10 @@
 package main
 
 import (
+	"net/http"
+	_ "net/http/pprof"
 	// "encoding/json"
+
 	"github.com/xuelang-group/suanpan-go-sdk/suanpan/log"
 	"github.com/xuelang-group/suanpan-go-sdk/suanpan/stream"
 )
@@ -28,6 +31,10 @@ func main() {
 		for req := range reqs {
 			handle(req)
 		}
+	}()
+
+	go func() {
+		http.ListenAndServe(":6060", nil)
 	}()
 
 	<-forever
