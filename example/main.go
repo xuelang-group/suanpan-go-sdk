@@ -5,8 +5,8 @@ import (
 	_ "net/http/pprof"
 	// "encoding/json"
 
-	"github.com/xuelang-group/suanpan-go-sdk/suanpan/log"
-	"github.com/xuelang-group/suanpan-go-sdk/suanpan/stream"
+	"github.com/xuelang-group/suanpan-go-sdk/suanpan/v1/log"
+	"github.com/xuelang-group/suanpan-go-sdk/suanpan/v1/stream"
 )
 
 func handle(r stream.Request) {

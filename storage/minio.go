@@ -6,7 +6,7 @@ import (
 
 	"github.com/mcuadros/go-defaults"
 	"github.com/minio/minio-go"
-	"github.com/xuelang-group/suanpan-go-sdk/suanpan/log"
+	"github.com/xuelang-group/suanpan-go-sdk/suanpan/v1/log"
 	"github.com/xuelang-group/suanpan-go-sdk/util"
 )
 

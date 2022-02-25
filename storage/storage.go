@@ -5,7 +5,7 @@ import (
 
 	"github.com/mcuadros/go-defaults"
 	"github.com/mitchellh/mapstructure"
-	"github.com/xuelang-group/suanpan-go-sdk/suanpan/log"
+	"github.com/xuelang-group/suanpan-go-sdk/suanpan/v1/log"
 )
 
 type Storage interface {

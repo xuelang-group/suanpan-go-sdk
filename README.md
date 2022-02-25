@@ -5,7 +5,7 @@
 ### 1. 获得右面板配置参数
 
 ```go
-import "github.com/xuelang-group/suanpan-go-sdk/suanpan/parameter"
+import "github.com/xuelang-group/suanpan-go-sdk/suanpan/v1/parameter"
 
 parameter.Get("--xxx")
 ```
@@ -13,7 +13,7 @@ parameter.Get("--xxx")
 ### 2. 发送消息与接受消息
 
 ```go
-import "github.com/xuelang-group/suanpan-go-sdk/suanpan/stream"
+import "github.com/xuelang-group/suanpan-go-sdk/suanpan/v1/stream"
 
 func handle(r stream.Request) {
         r.Send(map[string]interface{}{
@@ -25,7 +25,7 @@ func handle(r stream.Request) {
 ### 3. Storage Api
 
 ```go
-import "github.com/xuelang-group/suanpan-go-sdk/suanpan/storage"
+import "github.com/xuelang-group/suanpan-go-sdk/suanpan/v1/storage"
 
 storage.FGetObject(objectName, filePath)
 storage.FPutObject(objectName, filePath)
@@ -38,7 +38,7 @@ storage.DeleteMultiObjects(objectNames)
 ### 4. Log Api
 
 ```go
-import "github.com/xuelang-group/suanpan-go-sdk/suanpan/log"
+import "github.com/xuelang-group/suanpan-go-sdk/suanpan/v1/log"
 
 log.Trace("trace message")
 log.Tracef("trace message: %s", msg)
