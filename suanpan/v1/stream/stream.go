@@ -139,13 +139,14 @@ func (s *Stream) subscribe() <-chan Request {
 		for msg := range q.SubscribeQueue(s.StreamRecvQueue, group, consumer) {
 			var req Request
 			mapstructure.Decode(msg, &req)
+			req.Input = make(map[string]string)
 			for k, v := range msg {
 				match, err := regexp.MatchString(InputPattern, k)
 				if err != nil {
 					log.Errorf("Message regex match error: %w", err)
 				}
 				if match {
-					req.Data = v.(string)
+					req.Input[k] = v.(string)
 				}
 			}
 			reqs <- req
