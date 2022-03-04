@@ -2,6 +2,7 @@ package mq
 
 import (
 	"context"
+	"time"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/thoas/go-funk"
@@ -19,7 +20,7 @@ func (r *RedisMq) getClient() *redis.Client {
 	})
 }
 
-func (r *RedisMq) recvMessages(queue, group, consumer, consumeID string) []QueueMessage {
+func (r *RedisMq) recvMessages(queue, group, consumer, consumeID string) ([]QueueMessage, error) {
 	cli := r.getClient()
 	args := &redis.XReadGroupArgs{
 		Group:    group,
@@ -29,6 +30,7 @@ func (r *RedisMq) recvMessages(queue, group, consumer, consumeID string) []Queue
 	res, err := cli.XReadGroup(context.Background(), args).Result()
 	if err != nil {
 		log.Errorf("Read redis group failed: %w", err)
+		return nil, err
 	}
 
 	messages := make([]QueueMessage, 0)
@@ -54,7 +56,7 @@ func (r *RedisMq) recvMessages(queue, group, consumer, consumeID string) []Queue
 		log.Warnf("Messages have lost: %w", lostMessageIDs)
 	}
 
-	return messages
+	return messages, nil
 }
 
 func (r *RedisMq) createQueue(queue, group, consumeID string) {
@@ -75,7 +77,12 @@ func (r *RedisMq) SubscribeQueue(queue, group, consumer string) <-chan map[strin
 
 	go func() {
 		for {
-			messages := r.recvMessages(queue, group, consumer, ">")
+			messages, err := r.recvMessages(queue, group, consumer, ">")
+			if err != nil {
+				log.Warn("retry redis queue after 10 seconds")
+				time.Sleep(10 * time.Second)
+				continue
+			}
 			for _, message := range messages {
 				msg <- message.Data
 				cli.XAck(context.Background(), queue, group, message.ID)
