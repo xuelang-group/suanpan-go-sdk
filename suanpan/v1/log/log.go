@@ -57,7 +57,7 @@ func Trace(title string) {
 }
 
 func Tracef(format string, args ...interface{}) {
-	s := fmt.Sprintf(format, args)
+	s := fmt.Sprintf(format, args...)
 	Trace(s)
 }
 
@@ -67,7 +67,7 @@ func Debug(title string) {
 }
 
 func Debugf(format string, args ...interface{}) {
-	s := fmt.Sprintf(format, args)
+	s := fmt.Sprintf(format, args...)
 	Debug(s)
 }
 
@@ -77,7 +77,7 @@ func Info(title string) {
 }
 
 func Infof(format string, args ...interface{}) {
-	s := fmt.Sprintf(format, args)
+	s := fmt.Sprintf(format, args...)
 	logrus.Info(s)
 }
 
@@ -87,7 +87,7 @@ func Warn(title string) {
 }
 
 func Warnf(format string, args ...interface{}) {
-	s := fmt.Sprintf(format, args)
+	s := fmt.Sprintf(format, args...)
 	Warn(s)
 }
 
@@ -97,7 +97,7 @@ func Error(title string) {
 }
 
 func Errorf(format string, args ...interface{}) {
-	s := fmt.Sprintf(format, args)
+	s := fmt.Sprintf(format, args...)
 	Error(s)
 }
 
