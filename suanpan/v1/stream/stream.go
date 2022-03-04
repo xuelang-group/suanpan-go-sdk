@@ -143,7 +143,7 @@ func (s *Stream) subscribe() <-chan Request {
 			for k, v := range msg {
 				match, err := regexp.MatchString(InputPattern, k)
 				if err != nil {
-					log.Errorf("Message regex match error: %w", err)
+					log.Errorf("Message regex match error: %v", err)
 				}
 				if match {
 					req.Input[k] = v.(string)

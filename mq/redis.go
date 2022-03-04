@@ -29,7 +29,7 @@ func (r *RedisMq) recvMessages(queue, group, consumer, consumeID string) ([]Queu
 	}
 	res, err := cli.XReadGroup(context.Background(), args).Result()
 	if err != nil {
-		log.Errorf("Read redis group failed: %w", err)
+		log.Errorf("Read redis group failed: %v", err)
 		return nil, err
 	}
 
@@ -53,7 +53,7 @@ func (r *RedisMq) recvMessages(queue, group, consumer, consumeID string) ([]Queu
 	}).([]string)
 	if len(lostMessages) > 0 {
 		cli.XAck(context.Background(), queue, group, lostMessageIDs...)
-		log.Warnf("Messages have lost: %w", lostMessageIDs)
+		log.Warnf("Messages have lost: %v", lostMessageIDs)
 	}
 
 	return messages, nil
@@ -64,7 +64,7 @@ func (r *RedisMq) createQueue(queue, group, consumeID string) {
 	log.Infof("Create queue %s-%s", queue, group)
 	err := cli.XGroupCreateMkStream(context.Background(), queue, group, consumeID).Err()
 	if err != nil {
-		log.Warnf("Create redis queue error: %w", err)
+		log.Warnf("Create redis queue error: %v", err)
 	}
 }
 
@@ -104,7 +104,7 @@ func (r *RedisMq) SendMessage(queue string, data map[string]string, maxLen int64
 	}
 	id, err := cli.XAdd(context.Background(), args).Result()
 	if err != nil {
-		log.Errorf("Send redis message failed: %w", err)
+		log.Errorf("Send redis message failed: %v", err)
 	}
 
 	return id

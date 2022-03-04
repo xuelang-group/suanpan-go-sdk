@@ -20,7 +20,7 @@ func getSio() (*socketio.Conn, error) {
 	}
 	u, err := url.Parse(e.SpLogkitUri)
 	if err != nil {
-		logrus.Errorf("Parse url error: %w", err)
+		logrus.Errorf("Parse url error: %v", err)
 		return nil, err
 	}
 	schemeOpt := socketio.WithScheme("ws")
@@ -45,7 +45,7 @@ func getSio() (*socketio.Conn, error) {
 func EmitEventLog(title string, level LogLevel) {
 	sio, err := getSio()
 	if err != nil {
-		logrus.Errorf("Get sio error: %w", err)
+		logrus.Errorf("Get sio error: %v", err)
 		return
 	}
 	defer sio.Close()

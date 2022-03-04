@@ -32,7 +32,7 @@ func (o *OssStorage) getBucket() (*oss.Bucket, error) {
 
 	bucket, err := cli.Bucket(o.StorageOssBucketName)
 	if err != nil {
-		log.Errorf("Get oss bucket error: %w", err)
+		log.Errorf("Get oss bucket error: %v", err)
 		return nil, err
 	}
 
@@ -79,7 +79,7 @@ func (o *OssStorage) ListObjects(objectPrefix string, recursive bool, maxKeys in
 
 	res, err := bucket.ListObjectsV2(oss.Prefix(objectPrefix), oss.MaxKeys(maxKeys), delimiter)
 	if err != nil {
-		log.Errorf("List oss objects error: %w", err)
+		log.Errorf("List oss objects error: %v", err)
 		return nil, err
 	}
 

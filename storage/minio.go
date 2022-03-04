@@ -23,7 +23,7 @@ func (m *MinioStorage) getClient() (*minio.Client, error) {
 	defaults.SetDefaults(&minioStorage)
 	u, err := url.Parse(m.StorageMinioEndpoint)
 	if err != nil {
-		log.Errorf("Parse StorageMinioEndpoint error: %w", err)
+		log.Errorf("Parse StorageMinioEndpoint error: %v", err)
 		return nil, err
 	}
 
@@ -31,7 +31,7 @@ func (m *MinioStorage) getClient() (*minio.Client, error) {
 		u.Host, m.StorageMinioAccessKey,
 		m.StorageMinioSecretKey, u.Scheme == "https")
 	if err != nil {
-		log.Errorf("Init minio client error: %w", err)
+		log.Errorf("Init minio client error: %v", err)
 		return nil, err
 	}
 
@@ -81,7 +81,7 @@ func (m *MinioStorage) ListObjects(objectPrefix string, recursive bool, maxKeys 
 	objects := make([]ObjectItem, 0)
 	for o := range cli.ListObjectsV2(m.StorageMinioBucketName, objectPrefix, recursive, doneCh) {
 		if o.Err != nil {
-			log.Errorf("List objects error: %w", o.Err)
+			log.Errorf("List objects error: %v", o.Err)
 			return nil, o.Err
 		}
 		objects = append(objects, ObjectItem{
@@ -120,7 +120,7 @@ func (m *MinioStorage) DeleteMultiObjects(objectNames []string) error {
 
 	go func() {
 		for err := range cli.RemoveObjects(m.StorageMinioBucketName, objectsCh) {
-			log.Errorf("Remove object error: %w", err)
+			log.Errorf("Remove object error: %v", err)
 		}
 	}()
 

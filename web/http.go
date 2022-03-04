@@ -65,21 +65,21 @@ func GetStsTokenResp() (*StsTokenResp, error) {
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		logrus.Errorf("Request sts token error: %w", err)
+		logrus.Errorf("Request sts token error: %v", err)
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		logrus.Errorf("Read response body error: %w", err)
+		logrus.Errorf("Read response body error: %v", err)
 		return nil, err
 	}
 
 	var stsTokenResp *StsTokenResp
 	err = json.Unmarshal(data, &stsTokenResp)
 	if err != nil {
-		logrus.Errorf("Unmarshal json format error: %w", err)
+		logrus.Errorf("Unmarshal json format error: %v", err)
 	}
 
 	return stsTokenResp, nil

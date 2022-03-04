@@ -47,14 +47,14 @@ func GetEnv() *Env {
 func buildEnv() *Env {
 	err := envconfig.Process("config", e)
 	if err != nil {
-		logrus.Errorf("Decode env variables failed: %w", err)
+		logrus.Errorf("Decode env variables failed: %v", err)
 	}
 
 	defaults.SetDefaults(e)
 	validate := validator.New()
 	err = validate.Struct(e)
 	if err != nil {
-		logrus.Errorf("Validate env variables failed: %w", err)
+		logrus.Errorf("Validate env variables failed: %v", err)
 	}
 
 	return e
