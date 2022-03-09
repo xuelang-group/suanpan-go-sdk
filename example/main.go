@@ -2,9 +2,8 @@ package main
 
 import (
 	// "encoding/json"
-	"net/http"
-	_ "net/http/pprof"
 
+	"github.com/xuelang-group/suanpan-go-sdk/suanpan/v1/app"
 	"github.com/xuelang-group/suanpan-go-sdk/suanpan/v1/log"
 	"github.com/xuelang-group/suanpan-go-sdk/suanpan/v1/stream"
 )
@@ -24,19 +23,5 @@ func handle(r stream.Request) {
 }
 
 func main() {
-	reqs := stream.Subscribe()
-
-	forever := make(chan struct{})
-
-	go func() {
-		for req := range reqs {
-			handle(req)
-		}
-	}()
-
-	go func() {
-		http.ListenAndServe(":6060", nil)
-	}()
-
-	<-forever
+	app.Run(handle)
 }

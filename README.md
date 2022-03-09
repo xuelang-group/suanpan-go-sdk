@@ -8,6 +8,7 @@
 import "github.com/xuelang-group/suanpan-go-sdk/suanpan/v1/parameter"
 
 parameter.Get("param1")
+parameter.GetParam(1)
 ```
 
 ### 2. 发送消息与接受消息
