@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/base64"
+	"os"
 	"strings"
 	"sync"
 
@@ -35,10 +36,16 @@ func buildArgs() map[string]string {
 	}
 
 	paramArray := strings.Fields(strings.TrimSpace(string(params)))
+	addParamArray(paramArray)
+	addParamArray(os.Args[1:])
+
+	return argsMap
+}
+
+func addParamArray(paramArray []string) {
 	for i := 0; i < len(paramArray); i++ {
 		if strings.HasPrefix(paramArray[i], ArgNamePrefix) &&
-			i+1 < len(paramArray) &&
-			strings.HasPrefix(paramArray[i+1], ArgValuePrefix) {
+			i+1 < len(paramArray) {
 			if i+1 < len(paramArray) {
 				argsMap[paramArray[i]] = strings.Trim(paramArray[i+1], ArgValuePrefix)
 				i++
@@ -47,6 +54,4 @@ func buildArgs() map[string]string {
 			}
 		}
 	}
-
-	return argsMap
 }

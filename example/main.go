@@ -11,6 +11,7 @@ import (
 func handle(r stream.Request) {
 	log.Info("receive request data")
 	outputData := r.InputData(1)
+
 	// m := make(map[string]string)
 	// _ = json.Unmarshal([]byte(outputData), &m)
 	// m["hello"] = "world"
