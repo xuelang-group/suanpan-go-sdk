@@ -44,8 +44,7 @@ func buildArgs() map[string]string {
 
 func addParamArray(paramArray []string) {
 	for i := 0; i < len(paramArray); i++ {
-		if strings.HasPrefix(paramArray[i], ArgNamePrefix) &&
-			i+1 < len(paramArray) {
+		if strings.HasPrefix(paramArray[i], ArgNamePrefix) {
 			if i+1 < len(paramArray) {
 				argsMap[paramArray[i]] = strings.Trim(paramArray[i+1], ArgValuePrefix)
 				i++
