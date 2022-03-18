@@ -1,12 +1,10 @@
 package config
 
 import (
+	"os"
 	"sync"
 
-	"github.com/go-playground/validator/v10"
-	"github.com/kelseyhightower/envconfig"
-	"github.com/mcuadros/go-defaults"
-	"github.com/sirupsen/logrus"
+	"github.com/xuelang-group/suanpan-go-sdk/util"
 )
 
 var (
@@ -36,26 +34,34 @@ type Env struct {
 	SpLogkitLogsLevel            string `envconfig:"SP_LOGKIT_LOGS_LEVEL" default:"info"`
 }
 
+func buildEnv() *Env {
+	return &Env{
+		SpParam: os.Getenv("SP_PARAM"),
+		SpNodeId: util.EnvRequired("SP_NODE_ID"),
+		SpNodeGroup: util.EnvDefault("SP_NODE_GROUP","default"),
+		SpDebug: os.Getenv("SP_DEBUG"),
+		SpHost: util.EnvRequired("SP_HOST"),
+		SpHostTls: util.EnvDefault("SP_HOST_TLS", "false"),
+		SpOs: util.EnvDefault("SP_OS", "kubernetes"),
+		SpPort: util.EnvDefault("SP_PORT", "7000"),
+		SpUserId: util.EnvRequired("SP_USER_ID"),
+		SpAppId: util.EnvRequired("SP_APP_ID"),
+		SpAccessSecret: util.EnvRequired("SP_ACCESS_SECRET"),
+		SpUserIdHeaderField: util.EnvDefault("SP_USER_ID_HEADER_FIELD", "x-sp-user-id"),
+		SpUserSignatureHeaderField: util.EnvDefault("SP_USER_SIGNATURE_HEADER_FIELD", "x-sp-signature"),
+		SpUserSignVersionHeaderField: util.EnvDefault("SP_USER_SIGN_VERSION_HEADER_FIELD", "x-sp-sign-version"),
+		SpLogkitUri: os.Getenv("SP_LOGKIT_URI"),
+		SpLogkitNamespace: util.EnvDefault("SP_LOGKIT_NAMESPACE", "/logkit"),
+		SpLogkitPath: os.Getenv("SP_LOGKIT_PATH"),
+		SpLogkitEventsAppend: util.EnvDefault("SP_LOGKIT_EVENTS_APPEND", "append"),
+		SpLogkitLogsLevel: util.EnvDefault("SP_LOGKIT_LOGS_LEVEL", "info"),
+	}
+}
+
 func GetEnv() *Env {
 	envOnce.Do(func() {
 		e = buildEnv()
 	})
-
-	return e
-}
-
-func buildEnv() *Env {
-	err := envconfig.Process("config", e)
-	if err != nil {
-		logrus.Errorf("Decode env variables failed: %v", err)
-	}
-
-	defaults.SetDefaults(e)
-	validate := validator.New()
-	err = validate.Struct(e)
-	if err != nil {
-		logrus.Errorf("Validate env variables failed: %v", err)
-	}
 
 	return e
 }

@@ -3,9 +3,8 @@ package storage
 import (
 	"io"
 
-	"github.com/mcuadros/go-defaults"
-	"github.com/mitchellh/mapstructure"
 	"github.com/xuelang-group/suanpan-go-sdk/suanpan/v1/log"
+	"github.com/xuelang-group/suanpan-go-sdk/util"
 )
 
 type Storage interface {
@@ -27,22 +26,20 @@ const (
 )
 
 func New(argsMap map[string]string) Storage {
-	var envStorage EnvStorage
-	mapstructure.Decode(argsMap, &envStorage)
-	defaults.SetDefaults(&envStorage)
+	envStorage := newEnvStorage(argsMap)
 	switch envStorage.StorageType {
 	case Minio:
-		var minioStorage MinioStorage
-		mapstructure.Decode(argsMap, &minioStorage)
-		defaults.SetDefaults(&minioStorage)
-		return &minioStorage
+		return newMinioStorage(argsMap)
 	case Oss:
-		var ossStorage OssStorage
-		mapstructure.Decode(argsMap, &ossStorage)
-		defaults.SetDefaults(&ossStorage)
-		return &ossStorage
+		return newOssStorage(argsMap)
 	default:
 		log.Errorf("Unsupported storage type: %s", envStorage.StorageType)
 		return nil
+	}
+}
+
+func newEnvStorage(argsMap map[string]string) *EnvStorage {
+	return &EnvStorage{
+		StorageType: util.MapDefault(argsMap, "--storage-type", "minio"),
 	}
 }

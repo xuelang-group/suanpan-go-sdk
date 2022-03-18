@@ -7,11 +7,19 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/thoas/go-funk"
 	"github.com/xuelang-group/suanpan-go-sdk/suanpan/v1/log"
+	"github.com/xuelang-group/suanpan-go-sdk/util"
 )
 
 type RedisMq struct {
 	MqRedisHost string `mapstructure:"--mq-redis-host" default:"localhost"`
 	MqRedisPort string `mapstructure:"--mq-redis-port" default:"6379"`
+}
+
+func newRedisMq(argsMap map[string]string) *RedisMq {
+	return &RedisMq{
+		MqRedisHost: util.MapDefault(argsMap, "--mq-redis-host", "localhost"),
+		MqRedisPort: util.MapDefault(argsMap, "--mq-redis-port", "6379"),
+	}
 }
 
 func (r *RedisMq) getClient() *redis.Client {

@@ -5,8 +5,6 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/mcuadros/go-defaults"
-	"github.com/mitchellh/mapstructure"
 	"github.com/xuelang-group/suanpan-go-sdk/config"
 	"github.com/xuelang-group/suanpan-go-sdk/mq"
 	"github.com/xuelang-group/suanpan-go-sdk/suanpan/v1/log"
@@ -36,6 +34,15 @@ var (
 	streamOnce sync.Once
 )
 
+func newEnvStream(argsMap map[string]string) *EnvStream {
+	return &EnvStream{
+		StreamSendQueue: argsMap["--stream-send-queue"],
+		StreamRecvQueue: util.MapDefault(argsMap,"--stream-recv-queue", "mq-master"),
+		StreamSendQueueMaxLength: util.MapDefault(argsMap, "--stream-send-queue-max-length", "1000"),
+		StreamSendQueueTrimImmediately: util.MapDefault(argsMap, "--stream-send-queue-trim-immediately", "False"),
+	}
+}
+
 func getStream() *Stream {
 	streamOnce.Do(func() {
 		s = buildStream()
@@ -46,9 +53,7 @@ func getStream() *Stream {
 
 func buildStream() *Stream {
 	argsMap := config.GetArgs()
-	var envStream EnvStream
-	mapstructure.Decode(argsMap, &envStream)
-	defaults.SetDefaults(&envStream)
+	envStream := newEnvStream(argsMap)
 
 	sendQueue := envStream.StreamSendQueue
 	if sendQueue == "" {
@@ -137,8 +142,7 @@ func (s *Stream) subscribe() <-chan Request {
 
 	go func() {
 		for msg := range q.SubscribeQueue(s.StreamRecvQueue, group, consumer) {
-			var req Request
-			mapstructure.Decode(msg, &req)
+			req := newRequest(msg)
 			req.Input = make(map[string]string)
 			for k, v := range msg {
 				match, err := regexp.MatchString(InputPattern, k)
@@ -149,7 +153,7 @@ func (s *Stream) subscribe() <-chan Request {
 					req.Input[k] = v.(string)
 				}
 			}
-			reqs <- req
+			reqs <- *req
 		}
 	}()
 

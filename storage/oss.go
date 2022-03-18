@@ -18,6 +18,17 @@ type OssStorage struct {
 	StorageOssGlobalStore string `mapstructure:"--storage-oss-global-store"`
 }
 
+func newOssStorage(argsMap map[string]string) *OssStorage {
+	return &OssStorage{
+		StorageOssEndpoint: util.MapDefault(argsMap, "--storage-oss-endpoint", "http://oss-cn-beijing.aliyuncs.com"),
+		StorageOssBucketName: util.MapDefault(argsMap, "--storage-oss-bucket-name", "suanpan"),
+		StorageOssAccessId: argsMap["--storage-oss-access-id"],
+		StorageOssAccessKey: argsMap["--storage-oss-access-key"],
+		StorageOssTempStore: argsMap["--storage-oss-temp-store"],
+		StorageOssGlobalStore: argsMap["--storage-oss-global-store"],
+	}
+}
+
 func (o *OssStorage) getBucket() (*oss.Bucket, error) {
 	resp, err := web.GetStsTokenResp()
 	if err != nil {

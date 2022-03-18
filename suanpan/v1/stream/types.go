@@ -10,6 +10,13 @@ type Request struct {
 
 const InputDataPrefix = `in`
 
+func newRequest(msg map[string]interface{}) *Request {
+	return &Request{
+		ID: msg["id"].(string),
+		Extra: msg["extra"].(string),
+	}
+}
+
 func (r *Request) InputData(i int) string {
 	return r.Input[InputDataPrefix+strconv.Itoa(i)]
 }

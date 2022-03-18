@@ -4,7 +4,6 @@ import (
 	"io"
 	"net/url"
 
-	"github.com/mcuadros/go-defaults"
 	"github.com/minio/minio-go"
 	"github.com/xuelang-group/suanpan-go-sdk/suanpan/v1/log"
 	"github.com/xuelang-group/suanpan-go-sdk/util"
@@ -18,9 +17,17 @@ type MinioStorage struct {
 	StorageMinioTempStore  string `mapstructure:"--storage-minio-temp-store"`
 }
 
+func newMinioStorage(argsMap map[string]string) *MinioStorage {
+	return &MinioStorage{
+		StorageMinioEndpoint: util.MapDefault(argsMap, "--storage-minio-endpoint", "http://minio-service.default:9000"),
+		StorageMinioBucketName: util.MapDefault(argsMap, "--storage-minio-bucket-name", "suanpan"),
+		StorageMinioAccessKey: argsMap["--storage-minio-access-key"],
+		StorageMinioSecretKey: argsMap["--storage-minio-secret-key"],
+		StorageMinioTempStore: argsMap["--storage-minio-temp-store"],
+	}
+}
+
 func (m *MinioStorage) getClient() (*minio.Client, error) {
-	var minioStorage MinioStorage
-	defaults.SetDefaults(&minioStorage)
 	u, err := url.Parse(m.StorageMinioEndpoint)
 	if err != nil {
 		log.Errorf("Parse StorageMinioEndpoint error: %v", err)

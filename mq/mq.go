@@ -1,9 +1,8 @@
 package mq
 
 import (
-	"github.com/mcuadros/go-defaults"
-	"github.com/mitchellh/mapstructure"
 	"github.com/xuelang-group/suanpan-go-sdk/suanpan/v1/log"
+	"github.com/xuelang-group/suanpan-go-sdk/util"
 )
 
 const (
@@ -20,17 +19,18 @@ type EnvMq struct {
 }
 
 func New(argsMap map[string]string) Mq {
-	var envMq EnvMq
-	mapstructure.Decode(argsMap, &envMq)
-	defaults.SetDefaults(&envMq)
+	envMq := newEnvMq(argsMap)
 	switch envMq.MqType {
 	case Redis:
-		var redisMq RedisMq
-		mapstructure.Decode(argsMap, &redisMq)
-		defaults.SetDefaults(&redisMq)
-		return &redisMq
+		return newRedisMq(argsMap)
 	default:
 		log.Errorf("Unsupported mq type: %s", envMq.MqType)
 		return nil
+	}
+}
+
+func newEnvMq(argsMap map[string]string) *EnvMq {
+	return &EnvMq{
+		MqType: util.MapDefault(argsMap, "--mq-type", "redis"),
 	}
 }
