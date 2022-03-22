@@ -1,7 +1,7 @@
 package storage
 
 import (
-	"io"
+	"bytes"
 
 	"github.com/xuelang-group/suanpan-go-sdk/config"
 	"github.com/xuelang-group/suanpan-go-sdk/storage"
@@ -17,9 +17,9 @@ func FPutObject(objectName, filePath string) error {
 	return s.FPutObject(objectName, filePath)
 }
 
-func PutObject(objectName string, reader io.Reader) error {
+func PutObject(objectName string, byteArray []byte) error {
 	s := storage.New(config.GetArgs())
-	return s.PutObject(objectName, reader)
+	return s.PutObject(objectName, bytes.NewReader(byteArray))
 }
 
 func ListObjects(objectPrefix string, recursive bool, maxKeys int) ([]storage.ObjectItem, error) {
