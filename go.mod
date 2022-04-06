@@ -19,3 +19,5 @@ require (
 	github.com/thoas/go-funk v0.9.1
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect
 )
+
+replace github.com/satori/go.uuid => github.com/satori/go.uuid v1.2.0
