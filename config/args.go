@@ -47,7 +47,6 @@ func addParamArray(paramArray []string) {
 		if strings.HasPrefix(paramArray[i], ArgNamePrefix) {
 			if i+1 < len(paramArray) {
 				argsMap[paramArray[i]] = strings.Trim(paramArray[i+1], ArgValuePrefix)
-				i++
 			} else {
 				argsMap[paramArray[i]] = ""
 			}
