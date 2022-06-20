@@ -21,6 +21,7 @@ type Env struct {
 	SpDebug                      string `envconfig:"SP_DEBUG"`
 	SpHost                       string `envconfig:"SP_HOST" validate:"required"`
 	SpHostTls                    string `envconfig:"SP_HOST_TLS" default:"false"`
+	SpTermPort                   string `envconfig:"SP_TERM_PORT" default:"8002"`
 	SpOs                         string `envconfig:"SP_OS" default:"kubernetes"`
 	SpPort                       string `envconfig:"SP_PORT" default:"7000"`
 	SpUserId                     string `envconfig:"SP_USER_ID" validate:"required"`
