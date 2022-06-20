@@ -1,6 +1,7 @@
 package web
 
 import (
+	"bytes"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/xuelang-group/suanpan-go-sdk/config"
+	"github.com/xuelang-group/suanpan-go-sdk/util"
 )
 
 const (
@@ -83,4 +85,33 @@ func GetStsTokenResp() (*StsTokenResp, error) {
 	}
 
 	return stsTokenResp, nil
+}
+
+func RegisterPort(nodePort string) error {
+	path := "/app/service/register"
+	port, err := util.GetFreePort()
+	if err != nil {
+		logrus.Errorf("Get free port error: %v", err)
+		return err
+	}
+
+	body := map[string]string{
+		"appId": config.GetEnv().SpAppId,
+		"nodeId": config.GetEnv().SpNodeId,
+		"userId": config.GetEnv().SpUserId,
+		"nodePort": nodePort,
+		"port":strconv.Itoa(port),
+	}
+	bodyByte, err := json.Marshal(body)
+	if err != nil {
+		logrus.Errorf("Unmarshal json format error: %v", err)
+	}
+	resp, err := http.NewRequest("POST", getHttpServerUrl()+path, bytes.NewBuffer(bodyByte))
+	if err != nil {
+		logrus.Errorf("Regiter port error: %v", err)
+		return err
+	}
+	defer resp.Body.Close()
+
+	return nil
 }
