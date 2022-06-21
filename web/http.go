@@ -87,20 +87,24 @@ func GetStsTokenResp() (*StsTokenResp, error) {
 	return stsTokenResp, nil
 }
 
-func RegisterPort(nodePort string) error {
-	path := "/app/service/register"
+func RegisterFreePort(nodePort string) error {
 	port, err := util.GetFreePort()
 	if err != nil {
 		logrus.Errorf("Get free port error: %v", err)
 		return err
 	}
 
+	return RegisterPort(nodePort, strconv.Itoa(port))
+}
+
+func RegisterPort(nodePort string, port string) error {
+	path := "/app/service/register"
 	body := map[string]string{
 		"appId": config.GetEnv().SpAppId,
 		"nodeId": config.GetEnv().SpNodeId,
 		"userId": config.GetEnv().SpUserId,
 		"nodePort": nodePort,
-		"port":strconv.Itoa(port),
+		"port": port,
 	}
 	bodyByte, err := json.Marshal(body)
 	if err != nil {

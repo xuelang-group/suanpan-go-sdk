@@ -7,12 +7,26 @@ import (
 	"github.com/xuelang-group/suanpan-go-sdk/web"
 )
 
-func RegisterPort(nodePort string) {
+func RegisterFreePort(nodePort string) {
 	for {
-		err := web.RegisterPort(nodePort)
+		err := web.RegisterFreePort(nodePort)
+		if err != nil {
+			log.Warn("retry register free port after 10 seconds")
+			time.Sleep(10 * time.Second)
+		} else {
+			break
+		}
+	}
+}
+
+func RegisterPort(nodePort string, port string) {
+	for {
+		err := web.RegisterPort(nodePort, port)
 		if err != nil {
 			log.Warn("retry register port after 10 seconds")
 			time.Sleep(10 * time.Second)
+		} else {
+			break
 		}
 	}
 }
