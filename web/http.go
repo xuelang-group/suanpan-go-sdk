@@ -64,7 +64,6 @@ func GetStsTokenResp() (*StsTokenResp, error) {
 	path := `/oss/token`
 	req, err := http.NewRequest("GET", getHttpServerUrl()+path, nil)
 	req.Header = GetHeaders()
-
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		logrus.Errorf("Request sts token error: %v", err)
@@ -110,7 +109,10 @@ func RegisterPort(nodePort string, port string) error {
 	if err != nil {
 		logrus.Errorf("Unmarshal json format error: %v", err)
 	}
-	resp, err := http.NewRequest("POST", getHttpServerUrl()+path, bytes.NewBuffer(bodyByte))
+	req, err := http.NewRequest("POST", getHttpServerUrl()+path, bytes.NewBuffer(bodyByte))
+	req.Header = GetHeaders()
+	req.Header.Set("Content-Type","application/json")
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		logrus.Errorf("Regiter port error: %v", err)
 		return err
