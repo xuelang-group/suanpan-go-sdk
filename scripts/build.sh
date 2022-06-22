@@ -5,7 +5,6 @@ docker build -t ${IMAGE}:${VERSION} . -f ./Dockerfile
 docker tag ${IMAGE}:${VERSION} ${IMAGE}:${VERSION}${VERSION_TAIL}
 docker tag ${IMAGE}:${VERSION} ${IMAGE}:latest
 
-docker login registry.cn-shanghai.aliyuncs.com/shuzhi
 docker push ${IMAGE}:${VERSION}
 docker push ${IMAGE}:${VERSION}${VERSION_TAIL}
 docker push ${IMAGE}:latest
