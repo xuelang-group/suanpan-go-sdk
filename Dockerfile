@@ -12,4 +12,4 @@ RUN CGO_ENABLED=0 go build -ldflags "-s -w" -o server
 RUN apt-get update && apt-get install -y curl 
 
 EXPOSE 9001
-CMD ["/opt/app/server"]
+CMD ["/usr/src/app/server"]
