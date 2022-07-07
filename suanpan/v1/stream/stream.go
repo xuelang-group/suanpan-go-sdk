@@ -85,6 +85,12 @@ func (r *Request) Send(data map[string]string) string {
 	return r.SendSuccess(data)
 }
 
+func (r *Request) SendOutput(i int, data string) string {
+	return r.Send(map[string]string{
+		OutputDataPrefix+strconv.Itoa(i): data,
+	})
+}
+
 func (r *Request) SendSuccess(data map[string]string) string {
 	data["success"] = "true"
 	return r.send(data)
@@ -97,6 +103,12 @@ func (r *Request) SendFailure(data map[string]string) string {
 
 func Send(data map[string]string) string {
 	return SendSuccess(data)
+}
+
+func SendOutput(i int, data string) string {
+	return Send(map[string]string{
+		OutputDataPrefix+strconv.Itoa(i): data,
+	})
 }
 
 func SendSuccess(data map[string]string) string {
@@ -154,4 +166,8 @@ func (s *Stream) subscribe() <-chan Request {
 	}()
 
 	return reqs
+}
+
+func (r *Request) InputData(i int) string {
+	return r.Input[InputDataPrefix+strconv.Itoa(i)]
 }

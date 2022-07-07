@@ -18,9 +18,7 @@ func handle(r stream.Request) {
 	// b, _ := json.Marshal(m)
 	// outputData = string(b)
 
-	r.Send(map[string]string{
-		"out1": outputData,
-	})
+	r.SendOutput(1, outputData)
 }
 
 func main() {

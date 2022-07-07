@@ -17,9 +17,7 @@ parameter.GetParam(1)
 import "github.com/xuelang-group/suanpan-go-sdk/suanpan/v1/stream"
 
 func handle(r stream.Request) {
-        r.Send(map[string]interface{}{
-                "out1": r.InputData(1),
-        })
+	r.SendOutput(1, r.InputData(1))
 }
 ```
 
