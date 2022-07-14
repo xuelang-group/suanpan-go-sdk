@@ -18,9 +18,7 @@ func Run(f func(r stream.Request)) {
 		}
 	}()
 
-	go func() {
-		http.ListenAndServe(":6060", nil)
-	}()
+	go http.ListenAndServe(":6060", nil)
 
 	<-forever
 }

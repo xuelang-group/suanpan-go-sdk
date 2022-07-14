@@ -10,4 +10,3 @@ const (
 	InputDataPrefix = `in`
 	OutputDataPrefix = `out`
 )
-
