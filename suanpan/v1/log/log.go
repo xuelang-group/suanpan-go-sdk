@@ -12,7 +12,6 @@ import (
 var logLevel logkit.LogLevel
 
 func init() {
-	logrus.SetReportCaller(true)
 	logrus.SetFormatter(&logrus.TextFormatter{
 		DisableColors:   true,
 		TimestampFormat: "2006-01-02 15:04:05",
