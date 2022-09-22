@@ -10,8 +10,8 @@ import (
 )
 
 type RedisMq struct {
-	MqRedisHost string `mapstructure:"--mq-redis-host" default:"localhost"`
-	MqRedisPort string `mapstructure:"--mq-redis-port" default:"6379"`
+	MqRedisHost   string `mapstructure:"--mq-redis-host" default:"localhost"`
+	MqRedisPort   string `mapstructure:"--mq-redis-port" default:"6379"`
 	MqRedisClient *redis.Client
 }
 
