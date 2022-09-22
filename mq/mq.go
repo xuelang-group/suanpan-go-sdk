@@ -28,6 +28,7 @@ func New(argsMap map[string]string) Mq {
 		var redisMq RedisMq
 		mapstructure.Decode(argsMap, &redisMq)
 		defaults.SetDefaults(&redisMq)
+		redisMq.initClient()
 		return &redisMq
 	default:
 		log.Errorf("Unsupported mq type: %s", envMq.MqType)
