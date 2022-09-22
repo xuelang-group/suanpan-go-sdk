@@ -10,18 +10,19 @@ import (
 )
 
 type RedisMq struct {
-	MqRedisHost string `mapstructure:"--mq-redis-host" default:"localhost"`
-	MqRedisPort string `mapstructure:"--mq-redis-port" default:"6379"`
+	MqRedisHost   string `mapstructure:"--mq-redis-host" default:"localhost"`
+	MqRedisPort   string `mapstructure:"--mq-redis-port" default:"6379"`
+	MqRedisClient *redis.Client
 }
 
-func (r *RedisMq) getClient() *redis.Client {
-	return redis.NewClient(&redis.Options{
+func (r *RedisMq) initClient() {
+	r.MqRedisClient = redis.NewClient(&redis.Options{
 		Addr: r.MqRedisHost + ":" + r.MqRedisPort,
 	})
 }
 
 func (r *RedisMq) recvMessages(queue, group, consumer, consumeID string) ([]QueueMessage, error) {
-	cli := r.getClient()
+	cli := r.MqRedisClient
 	args := &redis.XReadGroupArgs{
 		Group:    group,
 		Consumer: consumer,
@@ -60,7 +61,7 @@ func (r *RedisMq) recvMessages(queue, group, consumer, consumeID string) ([]Queu
 }
 
 func (r *RedisMq) createQueue(queue, group, consumeID string) {
-	cli := r.getClient()
+	cli := r.MqRedisClient
 	log.Infof("Create queue %s-%s", queue, group)
 	err := cli.XGroupCreateMkStream(context.Background(), queue, group, consumeID).Err()
 	if err != nil {
@@ -69,7 +70,7 @@ func (r *RedisMq) createQueue(queue, group, consumeID string) {
 }
 
 func (r *RedisMq) SubscribeQueue(queue, group, consumer string) <-chan map[string]interface{} {
-	cli := r.getClient()
+	cli := r.MqRedisClient
 	r.createQueue(queue, group, "0")
 	log.Info("Subscribing message")
 
@@ -94,7 +95,7 @@ func (r *RedisMq) SubscribeQueue(queue, group, consumer string) <-chan map[strin
 }
 
 func (r *RedisMq) SendMessage(queue string, data map[string]string, maxLen int64, trimImmediately bool) string {
-	cli := r.getClient()
+	cli := r.MqRedisClient
 	args := &redis.XAddArgs{
 		Stream: queue,
 		Values: data,
