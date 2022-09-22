@@ -18,6 +18,7 @@ func Run(f func(r stream.Request)) {
 		}
 	}()
 
+	// :6060/debug/pprof
 	go http.ListenAndServe(":6060", nil)
 
 	<-forever
