@@ -10,16 +10,10 @@ import (
 func Run(f func(r stream.Request)) {
 	reqs := stream.Subscribe()
 
-	forever := make(chan struct{})
-
-	go func() {
-		for req := range reqs {
-			f(req)
-		}
-	}()
-
 	// :6060/debug/pprof
 	go http.ListenAndServe(":6060", nil)
 
-	<-forever
+	for req := range reqs {
+		go f(req)
+	}
 }
