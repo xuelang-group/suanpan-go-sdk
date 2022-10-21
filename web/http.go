@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"path"
 	"strconv"
 	"sync"
 
@@ -21,18 +22,6 @@ var (
 	httpServerUrl string
 	httpOnce      sync.Once
 )
-
-type Credentials struct {
-	SecurityToken   string `json:"SecurityToken"`
-	AccessKeyId     string `json:"AccessKeyId"`
-	AccessKeySecret string `json:"AccessKeySecret"`
-	Expiration      string `json:"Expiration"`
-}
-
-type StsTokenResp struct {
-	RequestId   string      `json:"RequestId"`
-	Credentials Credentials `json:"Credentials"`
-}
 
 func getHttpServerUrl() string {
 	httpOnce.Do(func() {
@@ -84,6 +73,39 @@ func GetStsTokenResp() (*StsTokenResp, error) {
 	}
 
 	return stsTokenResp, nil
+}
+
+func GetGraph() (*Graph, error) {
+	graphPath := path.Join(`/appcontroller/graph`, config.GetEnv().SpUserId, config.GetEnv().SpAppId)
+	req, err := http.NewRequest("GET", getHttpServerUrl()+graphPath, nil)
+	req.Header = GetHeaders()
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		logrus.Errorf("Request graph error: %v", err)
+	}
+	defer resp.Body.Close()
+
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		logrus.Errorf("Read response body error: %v", err)
+		return nil, err
+	}
+
+	var graphResp *GraphResp
+	err = json.Unmarshal(data, &graphResp)
+	if err != nil {
+		logrus.Errorf("Unmarshal graphResp json format error: %v", err)
+		return nil, err
+	}
+
+	var graph *Graph
+	err = json.Unmarshal([]byte(graphResp.GraphJson.GraphJsonStr), &graph)
+	if err != nil {
+		logrus.Errorf("Unmarshal graph json format error: %v", err)
+		return nil, err
+	}
+
+	return graph, nil
 }
 
 func RegisterFreePort(nodePort string) error {
