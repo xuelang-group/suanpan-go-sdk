@@ -82,6 +82,7 @@ func GetGraph() (*Graph, error) {
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		logrus.Errorf("Request graph error: %v", err)
+		return nil, err
 	}
 	defer resp.Body.Close()
 
