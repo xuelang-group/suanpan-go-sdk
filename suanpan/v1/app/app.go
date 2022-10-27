@@ -35,5 +35,5 @@ func Run(f func(r stream.Request)) {
 	go http.ListenAndServe(":" + config.GetEnv().SpTermPort, nil)
 
 	<- done
-	log.Info("Exsited")
+	log.Info("Exited")
 }
