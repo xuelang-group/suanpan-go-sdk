@@ -14,6 +14,10 @@ var (
 	envOnce sync.Once
 )
 
+const (
+	SpOsWindows	=	"windows"
+)
+
 type Env struct {
 	SpParam                      string `envconfig:"SP_PARAM"`
 	SpNodeId                     string `envconfig:"SP_NODE_ID" validate:"required"`
