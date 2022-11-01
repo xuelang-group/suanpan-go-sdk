@@ -77,7 +77,7 @@ func Info(title string) {
 
 func Infof(format string, args ...interface{}) {
 	s := fmt.Sprintf(format, args...)
-	logrus.Info(s)
+	Info(s)
 }
 
 func Warn(title string) {

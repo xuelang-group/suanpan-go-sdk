@@ -5,6 +5,7 @@ import (
 	_ "net/http/pprof"
 
 	"github.com/xuelang-group/suanpan-go-sdk/config"
+	"github.com/xuelang-group/suanpan-go-sdk/suanpan/v1/desktop"
 	"github.com/xuelang-group/suanpan-go-sdk/suanpan/v1/log"
 	"github.com/xuelang-group/suanpan-go-sdk/suanpan/v1/stream"
 )
@@ -32,7 +33,11 @@ func Run(f func(r stream.Request)) {
 		}
 	})
 
-	go http.ListenAndServe(":" + config.GetEnv().SpTermPort, nil)
+	port := config.GetEnv().SpTermPort
+	if config.GetEnv().SpOs == config.SpOsWindows {
+		port = desktop.RegisterFreePort(port)
+	}
+	go http.ListenAndServe(":" + port, nil)
 
 	<- done
 	log.Info("Exited")

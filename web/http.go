@@ -13,26 +13,10 @@ import (
 	"github.com/xuelang-group/suanpan-go-sdk/util"
 )
 
-const (
-	Windows = "windows"
-)
-
 var (
 	httpServerUrl string
 	httpOnce      sync.Once
 )
-
-type Credentials struct {
-	SecurityToken   string `json:"SecurityToken"`
-	AccessKeyId     string `json:"AccessKeyId"`
-	AccessKeySecret string `json:"AccessKeySecret"`
-	Expiration      string `json:"Expiration"`
-}
-
-type StsTokenResp struct {
-	RequestId   string      `json:"RequestId"`
-	Credentials Credentials `json:"Credentials"`
-}
 
 func getHttpServerUrl() string {
 	httpOnce.Do(func() {
@@ -53,7 +37,7 @@ func buildHttpServerUrl() string {
 		protocol = `https`
 	}
 	host := config.GetEnv().SpHost
-	if config.GetEnv().SpOs == Windows {
+	if config.GetEnv().SpOs == config.SpOsWindows {
 		host = host + `:` + config.GetEnv().SpPort
 	}
 
@@ -86,14 +70,15 @@ func GetStsTokenResp() (*StsTokenResp, error) {
 	return stsTokenResp, nil
 }
 
-func RegisterFreePort(nodePort string) error {
-	port, err := util.GetFreePort()
+func RegisterFreePort(nodePort string) (string, error) {
+	freeport, err := util.GetFreePort()
 	if err != nil {
 		logrus.Errorf("Get free port error: %v", err)
-		return err
+		return "", err
 	}
 
-	return RegisterPort(nodePort, strconv.Itoa(port))
+	port := strconv.Itoa(freeport)
+	return port, RegisterPort(nodePort, port)
 }
 
 func RegisterPort(nodePort string, port string) error {
