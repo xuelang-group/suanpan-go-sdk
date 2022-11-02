@@ -14,6 +14,7 @@ func RegisterFreePort(nodePort string) string {
 			log.Warn("retry register free port after 10 seconds")
 			time.Sleep(10 * time.Second)
 		} else {
+			log.Infof("listen port: %s", port)
 			return port
 		}
 	}
