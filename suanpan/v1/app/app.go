@@ -20,6 +20,7 @@ func Run(f func(r stream.Request)) {
 	}()
 
 	done := make(chan struct{}, 1)
+	defer close(done)
 
 	path := "/internal/trap"
 	http.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
