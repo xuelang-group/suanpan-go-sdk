@@ -29,6 +29,7 @@ type Stream struct {
 	StreamRecvQueue                string
 	StreamSendQueueMaxLength       int64
 	StreamSendQueueTrimImmediately bool
+	MessageQueue                   mq.Mq
 }
 
 var (
@@ -68,11 +69,14 @@ func buildStream() *Stream {
 		trimImmediately = false
 	}
 
+	q := mq.New(config.GetArgs())
+
 	return &Stream{
 		StreamSendQueue:                sendQueue,
 		StreamRecvQueue:                envStream.StreamRecvQueue,
 		StreamSendQueueMaxLength:       maxLen,
 		StreamSendQueueTrimImmediately: trimImmediately,
+		MessageQueue:                   q,
 	}
 }
 
@@ -87,7 +91,7 @@ func (r *Request) Send(data map[string]string) string {
 
 func (r *Request) SendOutput(i int, data string) string {
 	return r.Send(map[string]string{
-		OutputDataPrefix+strconv.Itoa(i): data,
+		OutputDataPrefix + strconv.Itoa(i): data,
 	})
 }
 
@@ -107,7 +111,7 @@ func Send(data map[string]string) string {
 
 func SendOutput(i int, data string) string {
 	return Send(map[string]string{
-		OutputDataPrefix+strconv.Itoa(i): data,
+		OutputDataPrefix + strconv.Itoa(i): data,
 	})
 }
 
@@ -136,8 +140,7 @@ func (r *Request) send(data map[string]string) string {
 }
 
 func (s *Stream) send(data map[string]string) string {
-	q := mq.New(config.GetArgs())
-	return q.SendMessage(s.StreamSendQueue, data, s.StreamSendQueueMaxLength, s.StreamSendQueueTrimImmediately)
+	return s.MessageQueue.SendMessage(s.StreamSendQueue, data, s.StreamSendQueueMaxLength, s.StreamSendQueueTrimImmediately)
 }
 
 func (s *Stream) subscribe() <-chan Request {
