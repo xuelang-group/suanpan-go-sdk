@@ -15,7 +15,7 @@ func Run(f func(r stream.Request)) {
 
 	go func() {
 		for req := range reqs {
-			go f(req)
+			f(req)
 		}
 	}()
 
