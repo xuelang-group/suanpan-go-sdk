@@ -75,7 +75,7 @@ func (m *MinioStorage) ListObjects(objectPrefix string, recursive bool, maxKeys 
 		return nil, err
 	}
 
-	doneCh := make(chan struct{})
+	doneCh := make(chan struct{}, 1)
 	defer close(doneCh)
 
 	objects := make([]ObjectItem, 0)
