@@ -14,11 +14,11 @@ import (
 )
 
 var (
-	sio            *socketio.Conn
+	sioClientConn  *socketio.ClientConn
 	onceWithoutErr util.OnceWithoutErr
 )
 
-func initSio() (*socketio.Conn, error) {
+func initSioClientConn() (*socketio.ClientConn, error) {
 	e := config.GetEnv()
 	if e.SpLogkitUri == "" {
 		return nil, errors.New("SpLogkitUri is empty")
@@ -37,38 +37,40 @@ func initSio() (*socketio.Conn, error) {
 		path = path + `/`
 	}
 	pathOpt := socketio.WithPath(path)
-	socketio.GetURL(u.Host, schemeOpt, pathOpt)
-
-	headerOpt := socketio.WithHeader(web.GetHeaders())
-	namespaceOpt := socketio.WithNamespace(e.SpLogkitNamespace)
-
 	u = socketio.GetURL(u.Host, schemeOpt, pathOpt)
 
-	return socketio.New(u.String(), headerOpt, namespaceOpt)
+	conn, err := socketio.NewClientConn(u.String(), &socketio.ClientOptions{
+		Namespace:      e.SpLogkitNamespace,
+		Header:         web.GetHeaders(), // not working now
+		Reconnect:      true,
+		EventBufferMax: 1000,
+	})
+
+	return conn, err
 }
 
-func getSio() (*socketio.Conn, error) {
-	if sio != nil {
-		return sio, nil
+func getSioClientConn() (*socketio.ClientConn, error) {
+	if sioClientConn != nil {
+		return sioClientConn, nil
 	}
 
 	var err error
 	onceWithoutErr.Do(func() error {
-		sio, err = initSio()
+		sioClientConn, err = initSioClientConn()
 		return err
 	})
 
-	if sio == nil {
-		return nil, errors.Join(errors.New("init sio internal error"), err)
+	if sioClientConn == nil {
+		return nil, err
 	}
 
-	return sio, nil
+	return sioClientConn, nil
 }
 
 func EmitEventLog(title string, level LogLevel) {
-	sio, err := getSio()
+	sio, err := getSioClientConn()
 	if err != nil {
-		logrus.Errorf("Get sio error: %v", err)
+		logrus.Errorf("Get sio client conn error: %v", err)
 		return
 	}
 
