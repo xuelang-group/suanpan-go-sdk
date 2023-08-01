@@ -63,7 +63,7 @@ func (c *client) NextReader() (session.FrameType, io.ReadCloser, error) {
 
 		switch pt {
 		case packet.PING:
-			logrus.Info("client receive ping....")
+			// logrus.Info("client receive ping....")
 			if err = r.Close(); err != nil {
 				log.Panic("close reader:", err)
 			}
@@ -72,7 +72,7 @@ func (c *client) NextReader() (session.FrameType, io.ReadCloser, error) {
 				return 0, nil, err
 			}
 
-			logrus.Info("client response pong....")
+			// logrus.Info("client response pong....")
 			w, err := c.conn.NextWriter(frame.String, packet.PONG)
 			if err != nil {
 				log.Panic(err)
