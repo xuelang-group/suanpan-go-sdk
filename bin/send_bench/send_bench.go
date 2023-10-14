@@ -65,9 +65,9 @@ func main() {
 	total_cnt_chan := make(chan struct{}, 1000)
 	main_donw_ch := make(chan struct{})
 
+	startTime := time.Now()
 	go func() {
 		for {
-			startTime := time.Now()
 			for i := 1; i <= cycle_cnt; i++ {
 				<-total_cnt_chan
 				total_cnt++
@@ -90,6 +90,7 @@ func main() {
 	}()
 
 	data := generateStringWithSize(data_size)
+	startTime = time.Now()
 	for i := 0; i < send_worker; i++ {
 		wg.Add(1)
 		go func(workerId int) {

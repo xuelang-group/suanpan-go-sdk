@@ -14,12 +14,17 @@ var recv_pak_cnt uint64 = 0
 var startTime = time.Now()
 var lastReceivedTime = time.Now()
 
+const TIMEOUT = 3
+
+var job_start = false
+
 func handle(r stream.Request) {
 	// Check if more than 5 seconds have passed since the last packet
-	if time.Since(lastReceivedTime).Seconds() > 5 {
+	if time.Since(lastReceivedTime).Seconds() > TIMEOUT {
 		recv_pak_cnt = 0
 		startTime = time.Now()
 		log.Infof("---new recv benchmark start, single pak_size:%.3f MB---", float64(len(r.InputData(1)))/(1024*1024))
+		job_start = true
 	}
 
 	lastReceivedTime = time.Now()
@@ -42,5 +47,17 @@ func handle(r stream.Request) {
 
 func main() {
 	log.Info("start recv bench")
+	go func() {
+		for {
+			// Check if more than 5 seconds have passed since the last packet
+			if job_start && time.Since(lastReceivedTime).Seconds() > TIMEOUT {
+				log.Infof("---recv benchmark stop, total pack recv:%d", recv_pak_cnt)
+				job_start = false
+			}
+			time.Sleep(800 * time.Millisecond)
+		}
+
+	}()
 	app.Run(handle)
+
 }
